@@ -84,7 +84,9 @@ struct Color {
 #define AQUA							{ 0, 255, 255 }
 #define WHITE							{ 255, 255, 255 }
 #define BLACK							{ 0, 0, 0 }
-const struct Color COLOR[] = { RED, GREEN, BLUE, YELLOW, PURPLE, AQUA, WHITE, BLACK };
+const struct Color COLOR[]	=			{ RED, GREEN, BLUE, YELLOW, PURPLE, AQUA, WHITE, BLACK };
+
+const Color PlayerColor[4]	=			{ RED,PURPLE, YELLOW,GREEN };
 
 // ********** Define Pins: Special-Button ********** 
 #define PLAYER1_SPECIAL_BUTTON		{0,28}//28
