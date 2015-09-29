@@ -35,13 +35,13 @@ void setupColorPins() {
 void setupSpecialButtons() {
 	Log("setup Special Buttons");
 	pinMode((PIN_ADDRESS PLAYER1_SPECIAL_BUTTON).pin, INPUT);
-	digitalWrite(PLAYER1_SPECIAL_BUTTON, HIGH); //enable Pullup-resistor
+	digitalWrite(PIN_ADDRESS PLAYER1_SPECIAL_BUTTON, HIGH); //enable Pullup-resistor
 	pinMode((PIN_ADDRESS PLAYER2_SPECIAL_BUTTON).pin, INPUT);
-	digitalWrite(PLAYER2_SPECIAL_BUTTON, HIGH); //enable Pullup-resistor
+	digitalWrite(PIN_ADDRESS PLAYER2_SPECIAL_BUTTON, HIGH); //enable Pullup-resistor
 	pinMode((PIN_ADDRESS PLAYER3_SPECIAL_BUTTON).pin, INPUT);
-	digitalWrite(PLAYER3_SPECIAL_BUTTON, HIGH); //enable Pullup-resistor
+	digitalWrite(PIN_ADDRESS PLAYER3_SPECIAL_BUTTON, HIGH); //enable Pullup-resistor
 	pinMode((PIN_ADDRESS PLAYER4_SPECIAL_BUTTON).pin, INPUT);
-	digitalWrite(PLAYER4_SPECIAL_BUTTON, HIGH); //enable Pullup-resistor
+	digitalWrite(PIN_ADDRESS PLAYER4_SPECIAL_BUTTON, HIGH); //enable Pullup-resistor
 }
 
 void setupSpecialButtonLEDs() {
@@ -61,13 +61,13 @@ void setupSpeedButtons() {
 	digitalWrite(A15, HIGH); // enable AnalogInput pullup resistor
 
 	pinMode((PIN_ADDRESS BUTTON_INC_SPEED_PLAYER1).pin, INPUT);
-	digitalWrite(BUTTON_INC_SPEED_PLAYER1, HIGH);
+	digitalWrite(PIN_ADDRESS BUTTON_INC_SPEED_PLAYER1, HIGH);
 	pinMode((PIN_ADDRESS BUTTON_DEC_SPEED_PLAYER1).pin, INPUT);
-	digitalWrite(BUTTON_DEC_SPEED_PLAYER1, HIGH);
+	digitalWrite(PIN_ADDRESS BUTTON_DEC_SPEED_PLAYER1, HIGH);
 	pinMode((PIN_ADDRESS BUTTON_INC_SPEED_PLAYER4).pin, INPUT);
-	digitalWrite(BUTTON_INC_SPEED_PLAYER4, HIGH);
+	digitalWrite(PIN_ADDRESS BUTTON_INC_SPEED_PLAYER4, HIGH);
 	pinMode((PIN_ADDRESS BUTTON_DEC_SPEED_PLAYER4).pin, INPUT);
-	digitalWrite(BUTTON_DEC_SPEED_PLAYER4, HIGH);
+	digitalWrite(PIN_ADDRESS BUTTON_DEC_SPEED_PLAYER4, HIGH);
 }
 
 void setupLightBarriers() {
