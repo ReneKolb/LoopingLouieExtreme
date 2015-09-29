@@ -68,9 +68,6 @@ void setupSpeedButtons() {
 	digitalWrite(BUTTON_INC_SPEED_PLAYER4, HIGH);
 	pinMode((PIN_ADDRESS BUTTON_DEC_SPEED_PLAYER4).pin, INPUT);
 	digitalWrite(BUTTON_DEC_SPEED_PLAYER4, HIGH);
-
-	pinMode(A0, INPUT);
-	digitalWrite(A0, LOW);
 }
 
 void setupLightBarriers() {

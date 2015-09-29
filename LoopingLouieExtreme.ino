@@ -336,6 +336,24 @@ void updatePlayerBoosterLEDs(const uint8_t player, const uint8_t amount) {
 	}
 }
 
+boolean playerChip(uint8_t player, uint8_t chip) {
+	return analogRead((PIN_ADDRESS (PlayerIRPins[player-1][chip-1])).pin-100) < 500;
+}
+
+uint8_t getPlayerChipAmount(uint8_t player) {
+	uint8_t amount=0;
+	if (playerChip(player, 1)) {
+		amount++;
+	}
+	if (playerChip(player, 2)) {
+		amount++;
+	}
+	if (playerChip(player, 3)) {
+		amount++;
+	}
+	return amount;
+}
+
 void setColor(const uint8_t player, const uint8_t r, const uint8_t g, const uint8_t b) {
 	analogWrite(RGB_LEDS[player - 1][0], r);
 	analogWrite(RGB_LEDS[player - 1][1], g);
@@ -347,7 +365,7 @@ void setColor(const uint8_t player, const Color color) {
 }
 
 
-void testFullOn() {
+void fullOn() {
 	for (int p = 0; p < 4; p++) {
 		for (int l = 0; l < 4; l++) {
 			digitalWrite(BOOSTER_LEDS[p][l], 255);
@@ -367,6 +385,25 @@ void testFullOn() {
 	digitalWrite(PIN_ADDRESS GLOBAL_IR, 255);
 }
 
+void fullOff() {
+	for (int p = 0; p < 4; p++) {
+		for (int l = 0; l < 4; l++) {
+			digitalWrite(BOOSTER_LEDS[p][l], 0);
+			digitalWrite(UVLEDs[p][l], 0);
+		}
+		for (int l = 0; l < 3; l++) {
+			digitalWrite(RGB_LEDS[p][l], 0);
+		}
+		for (int l = 0; l < 5; l++) {
+			digitalWrite(playerMiddleColors[p][l], 0);
+		}
+		for (int l = 0; l < 8; l++) {
+			digitalWrite(playerCircle[p][l], 0);
+		}
+		digitalWrite(SpecialButtonLED[p], 0);
+	}
+	digitalWrite(PIN_ADDRESS GLOBAL_IR, 0);
+}
 
 
 
@@ -421,7 +458,8 @@ void setup()
 
 	Log("setup done.");
 
-		testFullOn();
+	fullOn();
+//	digitalWrite(PIN_ADDRESS GLOBAL_IR, LOW);
 }
 
 int received;
@@ -462,13 +500,17 @@ void handleSerialInput() {
 		else if (data == 's') {
 			initGame();
 		}
+		else if (data == 'i') {
+			digitalWrite(PIN_ADDRESS GLOBAL_IR, HIGH);
+		}
+		else if (data == 'o') {
+			digitalWrite(PIN_ADDRESS GLOBAL_IR, LOW);
+		}
 	}
 }
 
 void loop()
 {
-	Log("wert: " + (String)(analogRead(0)));
-
 	switch (state) {
 	case STANDBY:
 		//any pressed button awakes from standby
@@ -476,6 +518,7 @@ void loop()
 			Log("Wake from Standby Mode");
 			standbyTmr = millis(); //reset StandbyTimer
 			state = IDLE;
+			fullOn();
 		}
 		break;
 	case  IDLE:
@@ -488,25 +531,7 @@ void loop()
 			Log("Switch to Standby Mode");
 			state = STANDBY;
 			//switch all LEDs off
-			int l;
-			for (int p = 0; p < 4; p++) {
-				for (l = 0; l < 4; l++) {
-					digitalWrite(BOOSTER_LEDS[p][l], LOW);
-					digitalWrite(UVLEDs[p][l], LOW);
-				}
-				for (l = 0; l < 3; l++) {
-					digitalWrite(RGB_LEDS[p][l], LOW);
-				}
-				for (l = 0; l < 5; l++) {
-					digitalWrite(playerMiddleColors[p][l], LOW);
-				}
-				for (l = 0; l < 8; l++) {
-					digitalWrite(playerCircle[p][l], LOW);
-
-				}
-				digitalWrite(SpecialButtonLED[p], LOW);
-			}
-			digitalWrite(PIN_ADDRESS GLOBAL_IR, LOW);
+			fullOff();
 		}
 		break;
 	case GAME:

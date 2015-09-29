@@ -119,6 +119,10 @@ const PIN_ADDRESS SpecialButtonLED[] = { PLAYER1_SPECIAL_BUTTON_LED, PLAYER2_SPE
 #define PIN_PLAYER4_IR2					{0,101}
 #define PIN_PLAYER4_IR3					{0,102}
 
+const PIN_ADDRESS PlayerIRPins[4][3]= { { PIN_PLAYER1_IR1 ,PIN_PLAYER1_IR2 ,PIN_PLAYER1_IR3 },
+										{ PIN_PLAYER2_IR1 ,PIN_PLAYER2_IR2 ,PIN_PLAYER2_IR3 },
+										{ PIN_PLAYER3_IR1 ,PIN_PLAYER3_IR2 ,PIN_PLAYER3_IR3 } };
+
 // ********** Define Pins: UV-LEDs ********** 
 #define PLAYER1_UV1						{ 2, 13 } //Einzelne LED am Häuschen
 #define PLAYER1_UV2						{ 2, 10 } //3 LEDs am Nachbar Häuschen

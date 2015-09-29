@@ -123,11 +123,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="defines.h" />
-    <None Include="gameLoops.ino" />
+    <None Include="gameLoops.ino">
+      <FileType>CppCode</FileType>
+    </None>
     <None Include="LoopingLouieExtreme.ino">
       <FileType>CppCode</FileType>
     </None>
-    <None Include="setupRoutines.ino" />
+    <None Include="setupRoutines.ino">
+      <FileType>CppCode</FileType>
+    </None>
     <None Include="timer.h" />
   </ItemGroup>
   <ItemGroup>
