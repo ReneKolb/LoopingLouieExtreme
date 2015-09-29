@@ -86,7 +86,7 @@ struct Color {
 #define BLACK							{ 0, 0, 0 }
 const struct Color COLOR[]	=			{ RED, GREEN, BLUE, YELLOW, PURPLE, AQUA, WHITE, BLACK };
 
-const Color PlayerColor[4]	=			{ RED,PURPLE, YELLOW,GREEN };
+const struct Color PlayerColor[4]	=		{ RED,PURPLE, YELLOW,GREEN };
 
 // ********** Define Pins: Special-Button ********** 
 #define PLAYER1_SPECIAL_BUTTON		{0,28}//28
@@ -123,7 +123,10 @@ const PIN_ADDRESS SpecialButtonLED[] = { PLAYER1_SPECIAL_BUTTON_LED, PLAYER2_SPE
 
 const PIN_ADDRESS PlayerIRPins[4][3]= { { PIN_PLAYER1_IR1 ,PIN_PLAYER1_IR2 ,PIN_PLAYER1_IR3 },
 										{ PIN_PLAYER2_IR1 ,PIN_PLAYER2_IR2 ,PIN_PLAYER2_IR3 },
-										{ PIN_PLAYER3_IR1 ,PIN_PLAYER3_IR2 ,PIN_PLAYER3_IR3 } };
+										{ PIN_PLAYER3_IR1 ,PIN_PLAYER3_IR2 ,PIN_PLAYER3_IR3 },
+										{ PIN_PLAYER4_IR1 ,PIN_PLAYER4_IR2 ,PIN_PLAYER4_IR3 } };
+
+#define IR_THRESHOLD 800
 
 // ********** Define Pins: UV-LEDs ********** 
 #define PLAYER1_UV1						{ 2, 13 } //Einzelne LED am Häuschen

@@ -18,6 +18,8 @@ uint8_t currentMotorSpeed;
 unsigned long motorSpeedChangeTmr;
 uint16_t motorSpeedChangeDelay;
 
+uint8_t winner;
+
 void enablePlayer(uint8_t player) {
 	setColor(player, PlayerColor[player - 1]);
 	for (int l = 0; l < 4; l++) {
@@ -31,6 +33,8 @@ void enablePlayer(uint8_t player) {
 	}
 	enabledPlayer[player - 1] = true;
 	chipCount[player - 1] = 3;
+
+	updatePlayerBoosterLEDs(player, 3);
 }
 
 void initGame() {
@@ -53,14 +57,15 @@ void initGame() {
 	chipCount[2] = 0;
 	chipCount[3] = 0;
 
+	winner = 255;
+
 	digitalWrite(PIN_ADDRESS GLOBAL_IR, HIGH);
+	delay(200);
 
 	Log("0: " + (String)(analogRead(0)) + "\t3: " + (String)(analogRead(3)) + "\t6: " + (String)(analogRead(6)) + "\t9: " + (String)(analogRead(9)));
 	Log("1: " + (String)(analogRead(1)) + "\t4: " + (String)(analogRead(4)) + "\t7: " + (String)(analogRead(7)) + "\t10: " + (String)(analogRead(10)));
 	Log("2: " + (String)(analogRead(2)) + "\t5: " + (String)(analogRead(5)) + "\t8: " + (String)(analogRead(8)) + "\t11: " + (String)(analogRead(11)));
-/*	Log("Dec 3: " + (String)isButtonPressed(BUTTON_DEC_SPEED_PLAYER3) + "Inc 3: " + (String)isButtonPressed(BUTTON_INC_SPEED_PLAYER3));
-	Log("Dec 2: " + (String)isButtonPressed(BUTTON_DEC_SPEED_PLAYER2) + "Inc 2: " + (String)isButtonPressed(BUTTON_INC_SPEED_PLAYER2));
-*/
+
 	playerCount = 0;
 	if (getPlayerChipAmount(1) == 3) {
 		Log("Player 1: OK");
@@ -98,8 +103,8 @@ void initGame() {
 		enabledPlayer[3] = false;
 	}
 
-	if (playerCount == 0) {
-		Log("Cannot start. No Players available");
+	if (playerCount <= 1) {
+		Log("Cannot start. Too few Players available (" +(String)playerCount+")");
 		state = IDLE;
 		//gameState = COUNTDOWN;
 	}
@@ -136,6 +141,7 @@ void gameLoop() {
 						if (cnt != chipCount[i]) { // still 0: player really has 0 chips 
 							//update Chip Count
 							chipCount[i] = cnt;
+							updatePlayerBoosterLEDs(i+1, cnt);
 							Log("player " + (String)(i + 1) + ": "+(String) cnt+" chips left");
 							if (cnt == 0) {
 								enabledPlayer[i] = false;
@@ -143,6 +149,13 @@ void gameLoop() {
 								//play "player lose" effect
 								Log((String)playerCount+" players left");
 								if (playerCount <= 1) {
+									for (int i = 0; i < 4;i++) {
+										if (enabledPlayer[i]) {
+											winner = i + 1;
+											break;
+										}
+									}
+
 									Log("Stop: playerCount <= 1");
 									endGame();
 									return;
@@ -170,14 +183,32 @@ void gameLoop() {
 		break;
 	case OUTRO:
 		//play final effects
+		if ((unsigned long)(millis() - gameStartCountdown) > 100) {
+			countdownAnimation++;
+			gameStartCountdown = millis();
+
+			//setColor(winner, (countdownAnimation%2==0)?(Color BLACK):(PlayerColor[winner-1]));
+			for (int i = 1; i <= 4; i++) {
+				setColor(i, (countdownAnimation % 2 == 0) ? (Color BLACK) : (PlayerColor[winner - 1]));
+			}
+
+			if (countdownAnimation > 21) {
+				state = IDLE;
+				fullOff(); 
+				return;
+			}
+		}
 		break;
 	}
 }
 
 void endGame() {
 	Log("End Game");
-	state = IDLE;
+	//state = IDLE;
+	gameState = OUTRO;
 	fullOff();
+	gameStartCountdown = millis();
+	countdownAnimation = 0;
 	//play end/win effect
 	digitalWrite(PIN_ADDRESS GLOBAL_IR, LOW);
 	setMotorSpeed(true,0);

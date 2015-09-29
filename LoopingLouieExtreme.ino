@@ -337,7 +337,7 @@ void updatePlayerBoosterLEDs(const uint8_t player, const uint8_t amount) {
 }
 
 boolean playerChip(uint8_t player, uint8_t chip) {
-	return analogRead((PIN_ADDRESS (PlayerIRPins[player-1][chip-1])).pin-100) < 500;
+	return analogRead(PlayerIRPins[player-1][chip-1].pin-100) < IR_THRESHOLD;
 }
 
 uint8_t getPlayerChipAmount(uint8_t player) {
@@ -502,9 +502,26 @@ void handleSerialInput() {
 		}
 		else if (data == 'i') {
 			digitalWrite(PIN_ADDRESS GLOBAL_IR, HIGH);
+			Log("Global IR on");
 		}
 		else if (data == 'o') {
 			digitalWrite(PIN_ADDRESS GLOBAL_IR, LOW);
+			Log("Global IR off");
+		}
+		else if (data == 'r') {
+			Log("IR status:");
+			Log(" 4 \t| 1 \t| 2 \t| 3");
+			Log("0: " + (String)(analogRead(0)) + "\t|3: " + (String)(analogRead(3)) + "\t|6: " + (String)(analogRead(6)) + "\t|9: " + (String)(analogRead(9)));
+			Log("1: " + (String)(analogRead(1)) + "\t|4: " + (String)(analogRead(4)) + "\t|7: " + (String)(analogRead(7)) + "\t|10: " + (String)(analogRead(10)));
+			Log("2: " + (String)(analogRead(2)) + "\t|5: " + (String)(analogRead(5)) + "\t|8: " + (String)(analogRead(8)) + "\t|11: " + (String)(analogRead(11)));
+			Log("  "+(String)getPlayerChipAmount(4)+"\t|  "+(String)getPlayerChipAmount(1) + "\t|  " + (String)getPlayerChipAmount(2) + "\t|  " + (String)getPlayerChipAmount(3));
+		}
+		else if (data == 'q') {
+			int value = Serial.parseInt();
+			//value = player [1..4]
+			Log("0: "+(String)analogRead(PlayerIRPins[value - 1][0].pin - 100));
+			Log("1: " + (String)analogRead(PlayerIRPins[value - 1][1].pin - 100));
+			Log("2: " + (String)analogRead(PlayerIRPins[value - 1][2].pin - 100));
 		}
 	}
 }
