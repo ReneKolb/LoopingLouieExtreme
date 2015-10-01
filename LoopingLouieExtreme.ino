@@ -21,207 +21,6 @@ Adafruit_MCP23017 mcpCircle1LEDs; // IO-Expander for Circle-LEDs
 Adafruit_MCP23017 mcpCircle2LEDs; // IO-Expander for Circle-LEDs
 
 
-/*unsigned long idleAnimationTmr[8] = { 0,  0,  0,  0,  0,  0,  0, 0 };
-long idleAnimationStep[8] = { -1, -1, -1, -1, -1, -1, -1, -1 };
-
-struct AnimationStep {
-	AnimationStep(PIN_ADDRESS addr, uint8_t val) : address(addr), value(val) {};
-	//AnimationStep(PIN_ADDRESS addr, uint8_t val, uint16_t delay) : address(addr), value(val), delayToNextStep(delay) {};
-	PIN_ADDRESS address;
-	uint8_t value;
-	//uint16_t delayToNextStep;
-};
-
-
-template<int maxSteps, int maxLEDs>
-struct Animation {
-	static const int maxStep = maxSteps;
-	static const int maxLED = maxLEDs;
-	long delay;
-	AnimationStep LEDs[maxSteps][maxLEDs];
-};
-
-const Animation<8, 1> idleAnimation1 = { 100,
-{
-	{ { PLAYER1_BOOSTER1, 255 } },
-	{ { PLAYER1_BOOSTER2, 255 } },
-	{ { PLAYER1_BOOSTER3, 255 } },
-	{ { PLAYER1_BOOSTER4, 255 } },
-	{ { PLAYER1_BOOSTER4, 0 } },
-	{ { PLAYER1_BOOSTER3, 0 } },
-	{ { PLAYER1_BOOSTER2, 0 } },
-	{ { PLAYER1_BOOSTER1, 0 } },
-}
-};
-
-const Animation<4, 6>  idleAnimation2 = { 150,
-{
-	{ { PLAYER4_COLOR_R,  0 },{ PLAYER4_COLOR_G, 0 },{ PLAYER4_COLOR_B, 0 },{ PLAYER1_COLOR_R,  255 },{ PLAYER1_COLOR_G, 0 },{ PLAYER1_COLOR_B, 0 } },
-	{ { PLAYER1_COLOR_R,  0 },{ PLAYER1_COLOR_G, 0 },{ PLAYER1_COLOR_B, 0 },{ PLAYER2_COLOR_R,  80 },{ PLAYER2_COLOR_G, 0 },{ PLAYER2_COLOR_B, 80 } },
-	{ { PLAYER2_COLOR_R,  0 },{ PLAYER2_COLOR_G, 0 },{ PLAYER2_COLOR_B, 0 },{ PLAYER3_COLOR_R,  255 },{ PLAYER3_COLOR_G, 100 },{ PLAYER3_COLOR_B, 0 } },
-	{ { PLAYER3_COLOR_R,  0 },{ PLAYER3_COLOR_G, 0 },{ PLAYER3_COLOR_B, 0 },{ PLAYER4_COLOR_R,  0 },{ PLAYER4_COLOR_G, 255 },{ PLAYER4_COLOR_B, 0 } }
-}
-};
-
-const Animation<8, 1> idleAnimation3 = { 100,
-{
-	{ { PLAYER2_BOOSTER1, 255 } },
-	{ { PLAYER2_BOOSTER2, 255 } },
-	{ { PLAYER2_BOOSTER3, 255 } },
-	{ { PLAYER2_BOOSTER4, 255 } },
-	{ { PLAYER2_BOOSTER4, 0 } },
-	{ { PLAYER2_BOOSTER3, 0 } },
-	{ { PLAYER2_BOOSTER2, 0 } },
-	{ { PLAYER2_BOOSTER1, 0 } }
-}
-};
-
-const Animation<8, 1> idleAnimation4 = { 100,
-{
-	{ { PLAYER3_BOOSTER1, 255 } },
-	{ { PLAYER3_BOOSTER2, 255 } },
-	{ { PLAYER3_BOOSTER3, 255 } },
-	{ { PLAYER3_BOOSTER4, 255 } },
-	{ { PLAYER3_BOOSTER4, 0 } },
-	{ { PLAYER3_BOOSTER3, 0 } },
-	{ { PLAYER3_BOOSTER2, 0 } },
-	{ { PLAYER3_BOOSTER1, 0 } }
-}
-};
-
-const Animation<8, 1> idleAnimation5 = { 100,
-{
-	{ { PLAYER4_BOOSTER1, 255 } },
-	{ { PLAYER4_BOOSTER2, 255 } },
-	{ { PLAYER4_BOOSTER3, 255 } },
-	{ { PLAYER4_BOOSTER4, 255 } },
-	{ { PLAYER4_BOOSTER4, 0 } },
-	{ { PLAYER4_BOOSTER3, 0 } },
-	{ { PLAYER4_BOOSTER2, 0 } },
-	{ { PLAYER4_BOOSTER1, 0 } }
-}
-};
-
-const Animation<2, 8> idleAnimation6 = { 1500,
-{
-	{ { PLAYER1_UV1, 255 },{ PLAYER1_UV2 , 255 },{ PLAYER2_UV1 , 255 },{ PLAYER2_UV2, 255 },{ PLAYER3_UV1, 255 },{ PLAYER3_UV2 , 255 },{ PLAYER4_UV1 , 255 },{ PLAYER4_UV2, 255 } },
-	{ { PLAYER1_UV1, 0 },{ PLAYER1_UV2 , 0 },{ PLAYER2_UV1 , 0 },{ PLAYER2_UV2, 0 },{ PLAYER3_UV1, 0 },{ PLAYER3_UV2 , 0 },{ PLAYER4_UV1 , 0 },{ PLAYER4_UV2, 0 } }
-}
-};
-
-const Animation<28, 2> middleSquence = { 24,
-{
-	{ { PIN_PLAYER1_LED1,255 },{ PIN_PLAYER4_LED5, 0 } },
-	{ { PIN_PLAYER1_LED2,255 },{ PIN_PLAYER1_LED1, 0 } },
-	{ { PIN_PLAYER1_LED3,255 },{ PIN_PLAYER1_LED2, 0 } },
-	{ { PIN_PLAYER1_LED4,255 },{ PIN_PLAYER1_LED3, 0 } },
-	{ { PIN_PLAYER1_LED5,255 },{ PIN_PLAYER1_LED4, 0 } },
-	{ { PLAYER1_UV4, 255 },{ PLAYER2_UV4, 255 } },
-	{ { PLAYER3_UV4, 255 },{ PLAYER4_UV4, 255 } },
-	{ { PIN_PLAYER2_LED1,255 },{ PIN_PLAYER1_LED5, 0 } },
-	{ { PIN_PLAYER2_LED2,255 },{ PIN_PLAYER2_LED1, 0 } },
-	{ { PIN_PLAYER2_LED3,255 },{ PIN_PLAYER2_LED2, 0 } },
-	{ { PIN_PLAYER2_LED4,255 },{ PIN_PLAYER2_LED3, 0 } },
-	{ { PIN_PLAYER2_LED5,255 },{ PIN_PLAYER2_LED4, 0 } },
-	{ { PLAYER1_UV3, 255 },{ PLAYER2_UV3, 255 } },
-	{ { PLAYER3_UV3, 255 },{ PLAYER4_UV3, 255 } },
-	{ { PIN_PLAYER3_LED1,255 },{ PIN_PLAYER2_LED5, 0 } },
-	{ { PIN_PLAYER3_LED2,255 },{ PIN_PLAYER3_LED1, 0 } },
-	{ { PIN_PLAYER3_LED3,255 },{ PIN_PLAYER3_LED2, 0 } },
-	{ { PIN_PLAYER3_LED4,255 },{ PIN_PLAYER3_LED3, 0 } },
-	{ { PIN_PLAYER3_LED5,255 },{ PIN_PLAYER3_LED4, 0 } },
-	{ { PLAYER1_UV4, 0 },{ PLAYER2_UV4, 0 } },
-	{ { PLAYER3_UV4, 0 },{ PLAYER4_UV4, 0 } },
-	{ { PIN_PLAYER4_LED1,255 },{ PIN_PLAYER3_LED5, 0 } },
-	{ { PIN_PLAYER4_LED2,255 },{ PIN_PLAYER4_LED1, 0 } },
-	{ { PIN_PLAYER4_LED3,255 },{ PIN_PLAYER4_LED2, 0 } },
-	{ { PIN_PLAYER4_LED4,255 },{ PIN_PLAYER4_LED3, 0 } },
-	{ { PIN_PLAYER4_LED5,255 },{ PIN_PLAYER4_LED4, 0 } },
-	{ { PLAYER1_UV3, 0 },{ PLAYER2_UV3, 0 } },
-	{ { PLAYER3_UV3, 0 },{ PLAYER4_UV3, 0 } }
-}
-};
-
-const Animation<32, 2> circleSquence = { 21,
-{
-	{ { PLAYER2_CIRCLE4,255 },{ PLAYER2_CIRCLE3, 0 } },
-	{ { PLAYER2_CIRCLE5,255 },{ PLAYER2_CIRCLE4, 0 } },
-	{ { PLAYER2_CIRCLE6,255 },{ PLAYER2_CIRCLE5, 0 } },
-	{ { PLAYER2_CIRCLE7,255 },{ PLAYER2_CIRCLE6, 0 } },
-	{ { PLAYER2_CIRCLE8,255 },{ PLAYER2_CIRCLE7, 0 } },
-
-	{ { PLAYER3_CIRCLE1,255 },{ PLAYER2_CIRCLE8, 0 } },
-	{ { PLAYER3_CIRCLE2,255 },{ PLAYER3_CIRCLE1, 0 } },
-	{ { PLAYER3_CIRCLE3,255 },{ PLAYER3_CIRCLE2, 0 } },
-	{ { PLAYER3_CIRCLE4,255 },{ PLAYER3_CIRCLE3, 0 } },
-	{ { PLAYER3_CIRCLE5,255 },{ PLAYER3_CIRCLE4, 0 } },
-	{ { PLAYER3_CIRCLE6,255 },{ PLAYER3_CIRCLE5, 0 } },
-	{ { PLAYER3_CIRCLE7,255 },{ PLAYER3_CIRCLE6, 0 } },
-	{ { PLAYER3_CIRCLE8,255 },{ PLAYER3_CIRCLE7, 0 } },
-
-	{ { PLAYER4_CIRCLE1,255 },{ PLAYER3_CIRCLE8, 0 } },
-	{ { PLAYER4_CIRCLE2,255 },{ PLAYER4_CIRCLE1, 0 } },
-	{ { PLAYER4_CIRCLE3,255 },{ PLAYER4_CIRCLE2, 0 } },
-	{ { PLAYER4_CIRCLE4,255 },{ PLAYER4_CIRCLE3, 0 } },
-	{ { PLAYER4_CIRCLE5,255 },{ PLAYER4_CIRCLE4, 0 } },
-	{ { PLAYER4_CIRCLE6,255 },{ PLAYER4_CIRCLE5, 0 } },
-	{ { PLAYER4_CIRCLE7,255 },{ PLAYER4_CIRCLE6, 0 } },
-	{ { PLAYER4_CIRCLE8,255 },{ PLAYER4_CIRCLE7, 0 } },
-
-	{ { PLAYER1_CIRCLE1,255 },{ PLAYER4_CIRCLE8, 0 } },
-	{ { PLAYER1_CIRCLE2,255 },{ PLAYER1_CIRCLE1, 0 } },
-	{ { PLAYER1_CIRCLE3,255 },{ PLAYER1_CIRCLE2, 0 } },
-	{ { PLAYER1_CIRCLE4,255 },{ PLAYER1_CIRCLE3, 0 } },
-	{ { PLAYER1_CIRCLE5,255 },{ PLAYER1_CIRCLE4, 0 } },
-	{ { PLAYER1_CIRCLE6,255 },{ PLAYER1_CIRCLE5, 0 } },
-	{ { PLAYER1_CIRCLE7,255 },{ PLAYER1_CIRCLE6, 0 } },
-	{ { PLAYER1_CIRCLE8,255 },{ PLAYER1_CIRCLE7, 0 } },
-
-	{ { PLAYER2_CIRCLE1,255 },{ PLAYER1_CIRCLE8, 0 } },
-	{ { PLAYER2_CIRCLE2,255 },{ PLAYER2_CIRCLE1, 0 } },
-	{ { PLAYER2_CIRCLE3,255 },{ PLAYER2_CIRCLE2, 0 } }
-}
-};
-
-const Animation<4, 32> circleSquence2 = { 25,
-{
-	{ { PLAYER1_CIRCLE1,255 },{ PLAYER1_CIRCLE2,255 },{ PLAYER1_CIRCLE3,255 },{ PLAYER1_CIRCLE4,255 },{ PLAYER1_CIRCLE5,255 },{ PLAYER1_CIRCLE6,255 },{ PLAYER1_CIRCLE7,255 },{ PLAYER1_CIRCLE8,255 },
-	{ PLAYER2_CIRCLE1,255 },{ PLAYER2_CIRCLE2,255 },{ PLAYER2_CIRCLE3,255 },{ PLAYER2_CIRCLE4,255 },{ PLAYER2_CIRCLE5,255 },{ PLAYER2_CIRCLE6,255 },{ PLAYER2_CIRCLE7,255 },{ PLAYER2_CIRCLE8,255 },
-	{ PLAYER3_CIRCLE1,255 },{ PLAYER3_CIRCLE2,255 },{ PLAYER3_CIRCLE3,255 },{ PLAYER3_CIRCLE4,255 },{ PLAYER3_CIRCLE5,255 },{ PLAYER3_CIRCLE6,255 },{ PLAYER3_CIRCLE7,255 },{ PLAYER3_CIRCLE8,255 },
-	{ PLAYER4_CIRCLE1,255 },{ PLAYER4_CIRCLE2,255 },{ PLAYER4_CIRCLE3,255 },{ PLAYER4_CIRCLE4,255 },{ PLAYER4_CIRCLE5,255 },{ PLAYER4_CIRCLE6,255 },{ PLAYER4_CIRCLE7,255 },{ PLAYER4_CIRCLE8,255 } },
-
-	{ { PLAYER1_CIRCLE1,0 },{ PLAYER1_CIRCLE2,0 },{ PLAYER1_CIRCLE3,0 },{ PLAYER1_CIRCLE4,0 },{ PLAYER1_CIRCLE5,0 },{ PLAYER1_CIRCLE6,0 },{ PLAYER1_CIRCLE7,0 },{ PLAYER1_CIRCLE8,0 },
-	{ PLAYER2_CIRCLE1,0 },{ PLAYER2_CIRCLE2,0 },{ PLAYER2_CIRCLE3,0 },{ PLAYER2_CIRCLE4,0 },{ PLAYER2_CIRCLE5,0 },{ PLAYER2_CIRCLE6,0 },{ PLAYER2_CIRCLE7,0 },{ PLAYER2_CIRCLE8,0 },
-	{ PLAYER3_CIRCLE1,0 },{ PLAYER3_CIRCLE2,0 },{ PLAYER3_CIRCLE3,0 },{ PLAYER3_CIRCLE4,0 },{ PLAYER3_CIRCLE5,0 },{ PLAYER3_CIRCLE6,0 },{ PLAYER3_CIRCLE7,0 },{ PLAYER3_CIRCLE8,0 },
-	{ PLAYER4_CIRCLE1,0 },{ PLAYER4_CIRCLE2,0 },{ PLAYER4_CIRCLE3,0 },{ PLAYER4_CIRCLE4,0 },{ PLAYER4_CIRCLE5,0 },{ PLAYER4_CIRCLE6,0 },{ PLAYER4_CIRCLE7,0 },{ PLAYER4_CIRCLE8,0 } },
-
-	{ { PLAYER1_CIRCLE1,0 },{ PLAYER1_CIRCLE2,0 },{ PLAYER1_CIRCLE3,0 },{ PLAYER1_CIRCLE4,0 },{ PLAYER1_CIRCLE5,0 },{ PLAYER1_CIRCLE6,0 },{ PLAYER1_CIRCLE7,0 },{ PLAYER1_CIRCLE8,0 },
-	{ PLAYER2_CIRCLE1,0 },{ PLAYER2_CIRCLE2,0 },{ PLAYER2_CIRCLE3,0 },{ PLAYER2_CIRCLE4,0 },{ PLAYER2_CIRCLE5,0 },{ PLAYER2_CIRCLE6,0 },{ PLAYER2_CIRCLE7,0 },{ PLAYER2_CIRCLE8,0 },
-	{ PLAYER3_CIRCLE1,0 },{ PLAYER3_CIRCLE2,0 },{ PLAYER3_CIRCLE3,0 },{ PLAYER3_CIRCLE4,0 },{ PLAYER3_CIRCLE5,0 },{ PLAYER3_CIRCLE6,0 },{ PLAYER3_CIRCLE7,0 },{ PLAYER3_CIRCLE8,0 },
-	{ PLAYER4_CIRCLE1,0 },{ PLAYER4_CIRCLE2,0 },{ PLAYER4_CIRCLE3,0 },{ PLAYER4_CIRCLE4,0 },{ PLAYER4_CIRCLE5,0 },{ PLAYER4_CIRCLE6,0 },{ PLAYER4_CIRCLE7,0 },{ PLAYER4_CIRCLE8,0 } },
-
-	{ { PLAYER1_CIRCLE1,0 },{ PLAYER1_CIRCLE2,0 },{ PLAYER1_CIRCLE3,0 },{ PLAYER1_CIRCLE4,0 },{ PLAYER1_CIRCLE5,0 },{ PLAYER1_CIRCLE6,0 },{ PLAYER1_CIRCLE7,0 },{ PLAYER1_CIRCLE8,0 },
-	{ PLAYER2_CIRCLE1,0 },{ PLAYER2_CIRCLE2,0 },{ PLAYER2_CIRCLE3,0 },{ PLAYER2_CIRCLE4,0 },{ PLAYER2_CIRCLE5,0 },{ PLAYER2_CIRCLE6,0 },{ PLAYER2_CIRCLE7,0 },{ PLAYER2_CIRCLE8,0 },
-	{ PLAYER3_CIRCLE1,0 },{ PLAYER3_CIRCLE2,0 },{ PLAYER3_CIRCLE3,0 },{ PLAYER3_CIRCLE4,0 },{ PLAYER3_CIRCLE5,0 },{ PLAYER3_CIRCLE6,0 },{ PLAYER3_CIRCLE7,0 },{ PLAYER3_CIRCLE8,0 },
-	{ PLAYER4_CIRCLE1,0 },{ PLAYER4_CIRCLE2,0 },{ PLAYER4_CIRCLE3,0 },{ PLAYER4_CIRCLE4,0 },{ PLAYER4_CIRCLE5,0 },{ PLAYER4_CIRCLE6,0 },{ PLAYER4_CIRCLE7,0 },{ PLAYER4_CIRCLE8,0 } }
-}
-};
-
-void DoAnimationStep(const AnimationStep leds[], int amount) {
-	for (int i = 0; i < amount; i++) {
-		if (leds[i].address.board != NONE.board && leds[i].address.pin != NONE.pin) {
-			if (leds[i].value == 0) {
-				digitalWrite(leds[i].address, 0);
-			}
-			else if (leds[i].value == 255) {
-				digitalWrite(leds[i].address, HIGH);
-			}
-			else {
-				analogWrite(leds[i].address, leds[i].value); //custom analogWrite
-			}
-		}
-	}
-}*/
 
 void Log(String msg) {
 	if (DEBUG) {
@@ -364,6 +163,22 @@ void setColor(const uint8_t player, const Color color) {
 	setColor(player, color.r, color.g, color.b);
 }
 
+void DoAnimationStep(const AnimationStep leds[], int amount) {
+	for (int i = 0; i < amount; i++) {
+		if (leds[i].address.board != NONE.board && leds[i].address.pin != NONE.pin) {
+			if (leds[i].value == 0) {
+				digitalWrite(leds[i].address, 0);
+			}
+			else if (leds[i].value == 255) {
+				digitalWrite(leds[i].address, HIGH);
+			}
+			else {
+				analogWrite(leds[i].address, leds[i].value); //custom analogWrite
+			}
+		}
+	}
+}
+
 
 void fullOn() {
 	for (int p = 0; p < 4; p++) {
@@ -405,7 +220,79 @@ void fullOff() {
 	digitalWrite(PIN_ADDRESS GLOBAL_IR, 0);
 }
 
+void idleAnimations() {
+	if ((unsigned long)(millis() - idleAnimationTmr[0]) > idleAnimation1.delay) {
+		idleAnimationTmr[0] = millis();
+		idleAnimationStep[0]++;
+		if (idleAnimationStep[0] >= idleAnimation1.maxStep) {
+			idleAnimationStep[0] = 0;
+		}
+		DoAnimationStep(idleAnimation1.LEDs[idleAnimationStep[0]], idleAnimation1.maxLED);
+	}
 
+	if ((unsigned long)(millis() - idleAnimationTmr[1]) > idleAnimation2.delay) {
+		idleAnimationTmr[1] = millis();
+		idleAnimationStep[1]++;
+		if (idleAnimationStep[1] >= idleAnimation2.maxStep) {
+			idleAnimationStep[1] = 0;
+		}
+		DoAnimationStep(idleAnimation2.LEDs[idleAnimationStep[1]], idleAnimation2.maxLED);
+	}
+
+	if ((unsigned long)(millis() - idleAnimationTmr[2]) > idleAnimation3.delay) {
+		idleAnimationTmr[2] = millis();
+		idleAnimationStep[2]++;
+		if (idleAnimationStep[2] >= idleAnimation3.maxStep) {
+			idleAnimationStep[2] = 0;
+		}
+		DoAnimationStep(idleAnimation3.LEDs[idleAnimationStep[2]], idleAnimation3.maxLED);
+	}
+
+	if ((unsigned long)(millis() - idleAnimationTmr[3]) > idleAnimation4.delay) {
+		idleAnimationTmr[3] = millis();
+		idleAnimationStep[3]++;
+		if (idleAnimationStep[3] >= idleAnimation4.maxStep) {
+			idleAnimationStep[3] = 0;
+		}
+		DoAnimationStep(idleAnimation4.LEDs[idleAnimationStep[3]], idleAnimation4.maxLED);
+	}
+
+	if ((unsigned long)(millis() - idleAnimationTmr[4]) > idleAnimation5.delay) {
+		idleAnimationTmr[4] = millis();
+		idleAnimationStep[4]++;
+		if (idleAnimationStep[4] >= idleAnimation5.maxStep) {
+			idleAnimationStep[4] = 0;
+		}
+		DoAnimationStep(idleAnimation5.LEDs[idleAnimationStep[4]], idleAnimation5.maxLED);
+	}
+
+	if ((unsigned long)(millis() - idleAnimationTmr[5]) > idleAnimation6.delay) {
+		idleAnimationTmr[5] = millis();
+		idleAnimationStep[5]++;
+		if (idleAnimationStep[5] >= idleAnimation6.maxStep) {
+			idleAnimationStep[5] = 0;
+		}
+		DoAnimationStep(idleAnimation6.LEDs[idleAnimationStep[5]], idleAnimation6.maxLED);
+	}
+
+	if ((unsigned long)(millis() - idleAnimationTmr[6]) > middleSquence.delay) {
+		idleAnimationTmr[6] = millis();
+		idleAnimationStep[6]++;
+		if (idleAnimationStep[6] >= middleSquence.maxStep) {
+			idleAnimationStep[6] = 0;
+		}
+		DoAnimationStep(middleSquence.LEDs[idleAnimationStep[6]], middleSquence.maxLED);
+	}
+
+	if ((unsigned long)(millis() - idleAnimationTmr[7]) > circleSquence.delay) {
+		idleAnimationTmr[7] = millis();
+		idleAnimationStep[7]++;
+		if (idleAnimationStep[7] >= circleSquence.maxStep) {
+			idleAnimationStep[7] = 0;
+		}
+		DoAnimationStep(circleSquence.LEDs[idleAnimationStep[7]], circleSquence.maxLED);
+	}
+}
 
 void setup()
 {
@@ -539,7 +426,7 @@ void loop()
 		}
 		break;
 	case  IDLE:
-		//idleAnimations(); // Play Idle Animations
+		idleAnimations(); // Play Idle Animations
 		if (checkButtons()) {
 			standbyTmr = millis();
 		}

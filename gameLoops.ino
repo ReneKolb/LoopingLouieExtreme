@@ -259,6 +259,7 @@ void gameLoop() {
 
 			if (countdownAnimation > 21) {
 				state = IDLE;
+				standbyTmr = millis(); // reset standby timer
 				fullOff(); 
 				return;
 			}
