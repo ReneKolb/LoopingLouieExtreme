@@ -4,11 +4,19 @@ enum GameState {
 	OUTRO
 };
 
+#define SPECIAL_COOLDOWN 5000
+#define TURBO_DURATION 300
+
 unsigned long gameStartCountdown;
 int countdownAnimation;
 GameState gameState;
 boolean enabledPlayer[4];
 uint8_t playerCount;
+
+unsigned long playerSpecialCooldownTmr[4];
+uint8_t playerSpecialItemAmount[4];
+
+unsigned long turboTmr;
 
 unsigned long recheckTmr[4];
 
@@ -37,6 +45,25 @@ void enablePlayer(uint8_t player) {
 	updatePlayerBoosterLEDs(player, 3);
 }
 
+void handleTurbo() {
+	turboTmr = millis();
+	setMotorSpeed(true, MAX_MOTOR_SPEED);
+}
+
+void handleSpecialButton(uint8_t player) {
+	if (playerSpecialCooldownTmr[player - 1] == 0) {
+		//no Cooldown
+		if (playerSpecialItemAmount[player - 1] >= 1) {
+			playerSpecialItemAmount[player - 1]--;
+			playerSpecialCooldownTmr[player - 1] = millis();
+			updatePlayerBoosterLEDs(player, playerSpecialItemAmount[player - 1]);
+			digitalWrite(SpecialButtonLED[player - 1], 0);
+
+			handleTurbo();
+		}
+	}
+}
+
 void initGame() {
 	Log("Init Game");
 	fullOff();
@@ -56,10 +83,21 @@ void initGame() {
 	chipCount[1] = 0;
 	chipCount[2] = 0;
 	chipCount[3] = 0;
+	playerSpecialCooldownTmr[0] = 0;
+	playerSpecialCooldownTmr[1] = 0;
+	playerSpecialCooldownTmr[2] = 0;
+	playerSpecialCooldownTmr[3] = 0;
+	playerSpecialItemAmount[0] = 4;
+	playerSpecialItemAmount[1] = 4;
+	playerSpecialItemAmount[2] = 4;
+	playerSpecialItemAmount[3] = 4;
+
+	turboTmr = 0;
 
 	winner = 255;
 
 	digitalWrite(PIN_ADDRESS GLOBAL_IR, HIGH);
+
 	delay(200);
 
 	Log("0: " + (String)(analogRead(0)) + "\t3: " + (String)(analogRead(3)) + "\t6: " + (String)(analogRead(6)) + "\t9: " + (String)(analogRead(9)));
@@ -106,7 +144,15 @@ void initGame() {
 	if (playerCount <= 1) {
 		Log("Cannot start. Too few Players available (" +(String)playerCount+")");
 		state = IDLE;
+		return;
 		//gameState = COUNTDOWN;
+	}
+
+	for (int i = 0; i < 4; i++) {
+		if (enabledPlayer[i]) {
+			updatePlayerBoosterLEDs(i + 1, 4);
+			digitalWrite(SpecialButtonLED[i], 255);
+		}
 	}
 }
 
@@ -127,12 +173,21 @@ void gameLoop() {
 		}
 		break;
 	case RUNNING:
+
+		if (turboTmr != 0) {
+			if ((unsigned long)(millis() - turboTmr) > TURBO_DURATION) {
+				turboTmr = 0;
+				setMotorSpeed(true, currentMotorSpeed);
+			}
+		}
+
 		for (int i = 0; i < 4; i++) {
 			if (enabledPlayer[i]) {
+				//player Loop
 				if (recheckTmr[i] == 0) {
 					if (getPlayerChipAmount(i + 1) != chipCount[i]) {
 						recheckTmr[i] = millis();
-						Log("player " + (String)(i + 1) + " recheck!");
+						//Log("player " + (String)(i + 1) + " recheck!");
 					}
 				}else{
 					if ((unsigned long)(millis() - recheckTmr[i]) > 500) {
@@ -141,13 +196,13 @@ void gameLoop() {
 						if (cnt != chipCount[i]) { // still 0: player really has 0 chips 
 							//update Chip Count
 							chipCount[i] = cnt;
-							updatePlayerBoosterLEDs(i+1, cnt);
-							Log("player " + (String)(i + 1) + ": "+(String) cnt+" chips left");
+							//updatePlayerBoosterLEDs(i+1, cnt);
+							//Log("player " + (String)(i + 1) + ": "+(String) cnt+" chips left");
 							if (cnt == 0) {
 								enabledPlayer[i] = false;
 								playerCount--;
 								//play "player lose" effect
-								Log((String)playerCount+" players left");
+								//Log((String)playerCount+" players left");
 								if (playerCount <= 1) {
 									for (int i = 0; i < 4;i++) {
 										if (enabledPlayer[i]) {
@@ -156,7 +211,7 @@ void gameLoop() {
 										}
 									}
 
-									Log("Stop: playerCount <= 1");
+									//Log("Stop: playerCount <= 1");
 									endGame();
 									return;
 								}
@@ -164,22 +219,32 @@ void gameLoop() {
 						}
 					}
 				}
-			}
+
+				if (playerSpecialCooldownTmr[i] != 0 && (unsigned long) (millis()-playerSpecialCooldownTmr[i]) >= SPECIAL_COOLDOWN ) {
+					playerSpecialCooldownTmr[i] = 0;
+					digitalWrite(SpecialButtonLED[i], 255);
+				}
+
+				if (isButtonPressed(SpecialButton[i])) {
+					handleSpecialButton(i+1);
+				}
+			} // end if(enabledPlayer)
 		}
 
 		if ((unsigned long)(millis() - motorSpeedChangeTmr)>motorSpeedChangeDelay) {
 			motorSpeedChangeTmr = millis();
 			motorSpeedChangeDelay = 4000 + random(4000);
-			currentMotorSpeed += random(70) - 35;
+			currentMotorSpeed += random(60) - 30; //Speed change (+- 30)
 			if (currentMotorSpeed < MIN_MOTOR_SPEED) {
 				currentMotorSpeed = MIN_MOTOR_SPEED;
 			}
-			if (currentMotorSpeed > MAX_MOTOR_SPEED - 20) {
-				currentMotorSpeed = MAX_MOTOR_SPEED - 20;
+			if (currentMotorSpeed > MAX_MOTOR_SPEED - 50) {
+				currentMotorSpeed = MAX_MOTOR_SPEED - 50;
 			}
 
 			setMotorSpeed(true, currentMotorSpeed);
 		}
+		
 		break;
 	case OUTRO:
 		//play final effects
