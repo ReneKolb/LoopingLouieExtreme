@@ -4,8 +4,14 @@ enum GameState {
 	OUTRO
 };
 
+enum SpecialItemType {
+	TURBO,
+	SLOW
+};
+
 #define SPECIAL_COOLDOWN 5000
 #define TURBO_DURATION 300
+#define SLOW_DURATION 500
 
 unsigned long gameStartCountdown;
 int countdownAnimation;
@@ -13,10 +19,16 @@ GameState gameState;
 boolean enabledPlayer[4];
 uint8_t playerCount;
 
+uint16_t animationDelay;
+unsigned long animationTmr;
+uint8_t animationStep;
+
 unsigned long playerSpecialCooldownTmr[4];
 uint8_t playerSpecialItemAmount[4];
+SpecialItemType playerSpecialItemType[4];
 
 unsigned long turboTmr;
+unsigned long slowTmr;
 
 unsigned long recheckTmr[4];
 
@@ -50,6 +62,11 @@ void handleTurbo() {
 	setMotorSpeed(true, MAX_MOTOR_SPEED);
 }
 
+void handleSlow() {
+	slowTmr = millis();
+	setMotorSpeed(true, 0);
+}
+
 void handleSpecialButton(uint8_t player) {
 	if (playerSpecialCooldownTmr[player - 1] == 0) {
 		//no Cooldown
@@ -58,10 +75,23 @@ void handleSpecialButton(uint8_t player) {
 			playerSpecialCooldownTmr[player - 1] = millis();
 			updatePlayerBoosterLEDs(player, playerSpecialItemAmount[player - 1]);
 			digitalWrite(SpecialButtonLED[player - 1], 0);
-
-			handleTurbo();
+			
+			switch (playerSpecialItemType[player - 1]) {
+			case TURBO:
+				handleTurbo();
+				break;
+			case SLOW:
+				handleSlow();
+				break;
+			}
 		}
 	}
+}
+
+uint16_t calcAnimationDelay(uint8_t motorSpeed) {
+	uint16_t newDelay = map(motorSpeed, MIN_MOTOR_SPEED, MAX_MOTOR_SPEED-50, 87, 20);
+	Log("new Delay: "+(String) newDelay);
+	return newDelay;
 }
 
 void initGame() {
@@ -73,8 +103,15 @@ void initGame() {
 	countdownAnimation = -1;
 	motorSpeedChangeTmr = millis();
 	motorSpeedChangeDelay = 4000 + random(4000);
-	currentMotorSpeed = 63;
+	currentMotorSpeed = NORMAL_MOTOR_SPEED;
+	animationDelay = calcAnimationDelay(currentMotorSpeed);
+	animationStep = -1;
+	animationTmr = millis();
 
+	enabledPlayer[0] = false;
+	enabledPlayer[1] = false;
+	enabledPlayer[2] = false;
+	enabledPlayer[3] = false;
 	recheckTmr[0] = 0;
 	recheckTmr[1] = 0;
 	recheckTmr[2] = 0;
@@ -92,17 +129,19 @@ void initGame() {
 	playerSpecialItemAmount[2] = 4;
 	playerSpecialItemAmount[3] = 4;
 
+	playerSpecialItemType[0] = TURBO;
+	playerSpecialItemType[1] = SLOW;
+	playerSpecialItemType[2] = TURBO;
+	playerSpecialItemType[3] = SLOW;
+
 	turboTmr = 0;
+	slowTmr = 0;
 
 	winner = 255;
 
 	digitalWrite(PIN_ADDRESS GLOBAL_IR, HIGH);
 
 	delay(200);
-
-	Log("0: " + (String)(analogRead(0)) + "\t3: " + (String)(analogRead(3)) + "\t6: " + (String)(analogRead(6)) + "\t9: " + (String)(analogRead(9)));
-	Log("1: " + (String)(analogRead(1)) + "\t4: " + (String)(analogRead(4)) + "\t7: " + (String)(analogRead(7)) + "\t10: " + (String)(analogRead(10)));
-	Log("2: " + (String)(analogRead(2)) + "\t5: " + (String)(analogRead(5)) + "\t8: " + (String)(analogRead(8)) + "\t11: " + (String)(analogRead(11)));
 
 	playerCount = 0;
 	if (getPlayerChipAmount(1) == 3) {
@@ -181,6 +220,13 @@ void gameLoop() {
 			}
 		}
 
+		if (slowTmr != 0) {
+			if ((unsigned long)(millis() - slowTmr) > SLOW_DURATION) {
+				slowTmr = 0;
+				setMotorSpeed(true, currentMotorSpeed);
+			}
+		}
+
 		for (int i = 0; i < 4; i++) {
 			if (enabledPlayer[i]) {
 				//player Loop
@@ -242,7 +288,17 @@ void gameLoop() {
 				currentMotorSpeed = MAX_MOTOR_SPEED - 50;
 			}
 
+			animationDelay = calcAnimationDelay(currentMotorSpeed);
 			setMotorSpeed(true, currentMotorSpeed);
+		}
+
+		if ((unsigned long)(millis() - animationTmr) > animationDelay) {
+			animationTmr = millis();
+			animationStep++;
+			if (animationStep >= circleSquenceGame.maxStep) {
+				animationStep = 0;
+			}
+			DoAnimationStep(circleSquenceGame.LEDs[animationStep], circleSquenceGame.maxLED);
 		}
 		
 		break;
