@@ -103,7 +103,7 @@ void setMotorSpeed(const boolean forward, uint8_t speed) {
 	Log("Motor Speed: " + (String)speed);
 }
 
-boolean isButtonPressed(PIN_ADDRESS pin) {
+boolean isButtonPressed(const PIN_ADDRESS pin) {
 	if (pin.pin >= 100) {
 		return digitalRead(pin) == LOW;
 	}
@@ -112,7 +112,13 @@ boolean isButtonPressed(PIN_ADDRESS pin) {
 	}
 }
 
+boolean checkButtons(uint8_t player) {
+	return isButtonPressed(SpeedButton[player - 1][0])|| isButtonPressed(SpeedButton[player - 1][1]) || isButtonPressed(SpecialButton[player - 1]);
+}
+
 boolean checkButtons() {
+	return checkButtons(1) || checkButtons(2)|| checkButtons(3) || checkButtons(4);
+	/*
 	return isButtonPressed(PIN_ADDRESS BUTTON_INC_SPEED_PLAYER1) || isButtonPressed(PIN_ADDRESS BUTTON_DEC_SPEED_PLAYER1)
 		|| isButtonPressed(PIN_ADDRESS BUTTON_INC_SPEED_PLAYER2) || isButtonPressed(PIN_ADDRESS BUTTON_DEC_SPEED_PLAYER2)
 		|| isButtonPressed(PIN_ADDRESS BUTTON_INC_SPEED_PLAYER3) || isButtonPressed(PIN_ADDRESS BUTTON_DEC_SPEED_PLAYER3)
@@ -121,6 +127,7 @@ boolean checkButtons() {
 		|| isButtonPressed(PIN_ADDRESS PLAYER2_SPECIAL_BUTTON)
 		|| isButtonPressed(PIN_ADDRESS PLAYER3_SPECIAL_BUTTON)
 		|| isButtonPressed(PIN_ADDRESS PLAYER4_SPECIAL_BUTTON);
+		*/
 }
 
 
@@ -200,10 +207,12 @@ void fullOn() {
 	digitalWrite(PIN_ADDRESS GLOBAL_IR, 255);
 }
 
-void fullOff() {
+void fullOff(boolean includeBoosterLEDs, boolean includeIR) {
 	for (int p = 0; p < 4; p++) {
 		for (int l = 0; l < 4; l++) {
-			digitalWrite(BOOSTER_LEDS[p][l], 0);
+			if (includeBoosterLEDs) {
+				digitalWrite(BOOSTER_LEDS[p][l], 0);
+			}
 			digitalWrite(UVLEDs[p][l], 0);
 		}
 		for (int l = 0; l < 3; l++) {
@@ -215,9 +224,17 @@ void fullOff() {
 		for (int l = 0; l < 8; l++) {
 			digitalWrite(playerCircle[p][l], 0);
 		}
-		digitalWrite(SpecialButtonLED[p], 0);
+		if (includeBoosterLEDs) {
+			digitalWrite(SpecialButtonLED[p], 0);
+		}
 	}
-	digitalWrite(PIN_ADDRESS GLOBAL_IR, 0);
+	if (includeIR) {
+		digitalWrite(PIN_ADDRESS GLOBAL_IR, 0);
+	}
+}
+
+void fullOff() {
+	fullOff(true,true);
 }
 
 void idleAnimations() {
@@ -292,6 +309,15 @@ void idleAnimations() {
 		}
 		DoAnimationStep(circleSquence.LEDs[idleAnimationStep[7]], circleSquence.maxLED);
 	}
+
+	/*if ((unsigned long)(millis() - idleAnimationTmr[7]) > nochntest.delay) {
+		idleAnimationTmr[7] = millis();
+		idleAnimationStep[7]++;
+		if (idleAnimationStep[7] >= nochntest.maxStep) {
+			idleAnimationStep[7] = 0;
+		}
+		DoAnimationStep(nochntest.LEDs[idleAnimationStep[7]], nochntest.maxLED);
+	}*/
 }
 
 void setup()

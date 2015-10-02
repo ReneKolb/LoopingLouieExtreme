@@ -11,7 +11,11 @@ enum SpecialItemType {
 
 #define SPECIAL_COOLDOWN 5000
 #define TURBO_DURATION 300
-#define SLOW_DURATION 500
+#define SLOW_DURATION 1000 // 500
+
+//Game Settings
+boolean enableSpecialItems = true;
+boolean enableEvents = true;
 
 unsigned long gameStartCountdown;
 int countdownAnimation;
@@ -22,6 +26,11 @@ uint8_t playerCount;
 uint16_t animationDelay;
 unsigned long animationTmr;
 uint8_t animationStep;
+
+unsigned long eventDelayTmr;
+uint16_t eventDelay;
+unsigned long eventTmr;
+#define EVENT_DURATION 1500
 
 unsigned long playerSpecialCooldownTmr[4];
 uint8_t playerSpecialItemAmount[4];
@@ -54,7 +63,14 @@ void enablePlayer(uint8_t player) {
 	enabledPlayer[player - 1] = true;
 	chipCount[player - 1] = 3;
 
-	updatePlayerBoosterLEDs(player, 3);
+	if (enableSpecialItems) {
+		updatePlayerBoosterLEDs(player, 4);
+		digitalWrite(SpecialButtonLED[player-1], 255);
+	}
+	else {
+		updatePlayerBoosterLEDs(player, 0);
+		digitalWrite(SpecialButtonLED[player - 1], 0);
+	}
 }
 
 void handleTurbo() {
@@ -137,6 +153,10 @@ void initGame() {
 	turboTmr = 0;
 	slowTmr = 0;
 
+	eventDelayTmr = 0;
+	eventDelay = 5000 + random(5000);
+	eventTmr = 0;
+
 	winner = 255;
 
 	digitalWrite(PIN_ADDRESS GLOBAL_IR, HIGH);
@@ -186,13 +206,6 @@ void initGame() {
 		return;
 		//gameState = COUNTDOWN;
 	}
-
-	for (int i = 0; i < 4; i++) {
-		if (enabledPlayer[i]) {
-			updatePlayerBoosterLEDs(i + 1, 4);
-			digitalWrite(SpecialButtonLED[i], 255);
-		}
-	}
 }
 
 void gameLoop() {
@@ -203,6 +216,9 @@ void gameLoop() {
 			if (countdownAnimation >= 8) {
 				gameState = RUNNING;
 				setMotorSpeed(true, currentMotorSpeed);
+				// reset/start Timers
+				motorSpeedChangeTmr = millis();
+				eventDelayTmr = millis(); 
 				Log("Countdown done -> start");
 			}
 			else {
@@ -239,17 +255,22 @@ void gameLoop() {
 					if ((unsigned long)(millis() - recheckTmr[i]) > 500) {
 						recheckTmr[i] = 0;
 						uint8_t cnt = getPlayerChipAmount(i + 1);
-						if (cnt != chipCount[i]) { // still 0: player really has 0 chips 
+						if (cnt != chipCount[i]) { // chip amount is still different -> has really changed
 							//update Chip Count
 							chipCount[i] = cnt;
-							//updatePlayerBoosterLEDs(i+1, cnt);
 							//Log("player " + (String)(i + 1) + ": "+(String) cnt+" chips left");
 							if (cnt == 0) {
 								enabledPlayer[i] = false;
+								//TEST: disable Player LEDs
+								for (int l = 0; l < 5; l++) {
+									digitalWrite(playerMiddleColors[i][l],0);
+								}
+								setColor(i + 1, Color BLACK);
 								playerCount--;
-								//play "player lose" effect
+								//TODO: play "player lose" effect
 								//Log((String)playerCount+" players left");
 								if (playerCount <= 1) {
+									//Only 1 player left -> game is finished!
 									for (int i = 0; i < 4;i++) {
 										if (enabledPlayer[i]) {
 											winner = i + 1;
@@ -268,13 +289,77 @@ void gameLoop() {
 
 				if (playerSpecialCooldownTmr[i] != 0 && (unsigned long) (millis()-playerSpecialCooldownTmr[i]) >= SPECIAL_COOLDOWN ) {
 					playerSpecialCooldownTmr[i] = 0;
-					digitalWrite(SpecialButtonLED[i], 255);
+					if (playerSpecialItemAmount[i] > 0) {
+						//nur rote LED anschalten, wenn noch Items übrig sind
+						digitalWrite(SpecialButtonLED[i], 255);
+					}
 				}
 
-				if (isButtonPressed(SpecialButton[i])) {
-					handleSpecialButton(i+1);
+				if (enableSpecialItems && eventTmr == 0) {
+					//only when no event is in progress, a player can use special items
+					if (isButtonPressed(SpecialButton[i])) {
+						handleSpecialButton(i + 1);
+					}
 				}
+
+				//to prevent spamming + - speed buttons: start special cooldown
+				if (eventTmr==0 && (isButtonPressed(SpeedButton[i][0])||isButtonPressed(SpeedButton[i][1]))) {
+					playerSpecialCooldownTmr[i] = millis();
+					digitalWrite(SpecialButtonLED[i], 0);
+				}
+			
 			} // end if(enabledPlayer)
+		} // end iterating players
+
+		if ((unsigned long)(millis() - eventDelayTmr) > eventDelay) {
+			//executeEvent
+			eventDelayTmr = millis();
+			eventDelay = EVENT_DURATION + 4500 + random(7000);
+			eventTmr = millis();
+
+			//signalize that an event has started
+			fullOff(false, false);
+		}
+
+		if (eventTmr != 0) {
+			if ((unsigned long)(millis() - eventTmr) > EVENT_DURATION) {
+				eventTmr = 0; //cancel event
+				//TEST
+				for (int i = 0; i < 4;i++) {
+					if (enabledPlayer[i]) {
+						for (int l = 0; l < 5;l++) {
+							digitalWrite(playerMiddleColors[i][l],255);
+						}
+						setColor(i+1,PlayerColor[i]);
+					}
+				}
+			}
+			else {
+				for (int i = 1; i <= 4; i++) {
+					if (checkButtons(i)) {
+						//end event -> a player has pressed a button
+						eventTmr = 0;
+						playerSpecialItemAmount[i - 1]++;
+						//play Effect
+						if (playerSpecialItemAmount[i - 1] > 4) {
+							playerSpecialItemAmount[i - 1] = 4;
+						}
+						else {
+							updatePlayerBoosterLEDs(i, playerSpecialItemAmount[i - 1]);
+						}
+
+						for (int i = 0; i < 4; i++) {
+							if (enabledPlayer[i]) {
+								for (int l = 0; l < 5; l++) {
+									digitalWrite(playerMiddleColors[i][l], 255);
+								}
+								setColor(i + 1, PlayerColor[i]);
+							}
+						}
+						break;
+					}
+				}
+			}
 		}
 
 		if ((unsigned long)(millis() - motorSpeedChangeTmr)>motorSpeedChangeDelay) {
@@ -292,13 +377,16 @@ void gameLoop() {
 			setMotorSpeed(true, currentMotorSpeed);
 		}
 
-		if ((unsigned long)(millis() - animationTmr) > animationDelay) {
-			animationTmr = millis();
-			animationStep++;
-			if (animationStep >= circleSquenceGame.maxStep) {
-				animationStep = 0;
+		if (eventTmr == 0) {
+			//only handle game animation when no event is in progress
+			if ((unsigned long)(millis() - animationTmr) > animationDelay) {
+				animationTmr = millis();
+				animationStep++;
+				if (animationStep >= circleSquenceGame.maxStep) {
+					animationStep = 0;
+				}
+				DoAnimationStep(circleSquenceGame.LEDs[animationStep], circleSquenceGame.maxLED);
 			}
-			DoAnimationStep(circleSquenceGame.LEDs[animationStep], circleSquenceGame.maxLED);
 		}
 		
 		break;

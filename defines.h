@@ -250,6 +250,13 @@ const PIN_ADDRESS playerCircle[4][8] = {
 #define BUTTON_INC_SPEED_PLAYER3		{0,114}
 #define BUTTON_DEC_SPEED_PLAYER3		{0,115}
 
+const PIN_ADDRESS SpeedButton[4][2] = {
+	{ BUTTON_INC_SPEED_PLAYER1 ,BUTTON_DEC_SPEED_PLAYER1 },
+	{ BUTTON_INC_SPEED_PLAYER2 ,BUTTON_DEC_SPEED_PLAYER2 },
+	{ BUTTON_INC_SPEED_PLAYER3 ,BUTTON_DEC_SPEED_PLAYER3 },
+	{ BUTTON_INC_SPEED_PLAYER4 ,BUTTON_DEC_SPEED_PLAYER4 }
+};
+
 unsigned long idleAnimationTmr[8] = { 0,  0,  0,  0,  0,  0,  0, 0 };
 long idleAnimationStep[8] = { -1, -1, -1, -1, -1, -1, -1, -1 };
 
@@ -371,7 +378,7 @@ const Animation<28, 2> middleSquence = { 24,
 }
 };
 
-const Animation<32, 2> circleSquence = { 21,
+const Animation<32, 2> circleSquence = { 30,
 {
 	{ { PLAYER2_CIRCLE4,255 },{ PLAYER2_CIRCLE3, 0 } },
 	{ { PLAYER2_CIRCLE5,255 },{ PLAYER2_CIRCLE4, 0 } },
@@ -505,6 +512,82 @@ const Animation<49, 2> circleSquenceGame = { 21,
 	{ { PLAYER1_UV1,0 },{ PLAYER1_UV2,0 } },
 	{ { PLAYER1_UV3,0 },{ PLAYER1_UV4,0 } }
 
+}
+};
+
+const Animation<64, 1> nochntest = { 21,
+{
+	{ { PLAYER1_CIRCLE1,255 } },
+	{ { PLAYER1_CIRCLE2,255 } },
+	{ { PLAYER1_CIRCLE3,255 } },
+	{ { PLAYER1_CIRCLE4,255 } },
+	{ { PLAYER1_CIRCLE5,255 } },
+	{ { PLAYER1_CIRCLE6,255 } },
+	{ { PLAYER1_CIRCLE7,255 } },
+	{ { PLAYER1_CIRCLE8,255 } },
+
+	{ { PLAYER2_CIRCLE1,255 } },
+	{ { PLAYER2_CIRCLE2,255 } },
+	{ { PLAYER2_CIRCLE3,255 } },
+	{ { PLAYER2_CIRCLE4,255 } },
+	{ { PLAYER2_CIRCLE5,255 } },
+	{ { PLAYER2_CIRCLE6,255 } },
+	{ { PLAYER2_CIRCLE7,255 } },
+	{ { PLAYER2_CIRCLE8,255 } },
+
+	{ { PLAYER3_CIRCLE1,255 } },
+	{ { PLAYER3_CIRCLE2,255 } },
+	{ { PLAYER3_CIRCLE3,255 } },
+	{ { PLAYER3_CIRCLE4,255 } },
+	{ { PLAYER3_CIRCLE5,255 } },
+	{ { PLAYER3_CIRCLE6,255 } },
+	{ { PLAYER3_CIRCLE7,255 } },
+	{ { PLAYER3_CIRCLE8,255 } },
+
+	{ { PLAYER4_CIRCLE1,255 } },
+	{ { PLAYER4_CIRCLE2,255 } },
+	{ { PLAYER4_CIRCLE3,255 } },
+	{ { PLAYER4_CIRCLE4,255 } },
+	{ { PLAYER4_CIRCLE5,255 } },
+	{ { PLAYER4_CIRCLE6,255 } },
+	{ { PLAYER4_CIRCLE7,255 } },
+	{ { PLAYER4_CIRCLE8,255 } },
+
+	{ { PLAYER1_CIRCLE1,0 } },
+	{ { PLAYER1_CIRCLE2,0 } },
+	{ { PLAYER1_CIRCLE3,0 } },
+	{ { PLAYER1_CIRCLE4,0 } },
+	{ { PLAYER1_CIRCLE5,0 } },
+	{ { PLAYER1_CIRCLE6,0 } },
+	{ { PLAYER1_CIRCLE7,0 } },
+	{ { PLAYER1_CIRCLE8,0 } },
+
+	{ { PLAYER2_CIRCLE1,0 } },
+	{ { PLAYER2_CIRCLE2,0 } },
+	{ { PLAYER2_CIRCLE3,0 } },
+	{ { PLAYER2_CIRCLE4,0 } },
+	{ { PLAYER2_CIRCLE5,0 } },
+	{ { PLAYER2_CIRCLE6,0 } },
+	{ { PLAYER2_CIRCLE7,0 } },
+	{ { PLAYER2_CIRCLE8,0 } },
+
+	{ { PLAYER3_CIRCLE1,0 } },
+	{ { PLAYER3_CIRCLE2,0 } },
+	{ { PLAYER3_CIRCLE3,0 } },
+	{ { PLAYER3_CIRCLE4,0 } },
+	{ { PLAYER3_CIRCLE5,0 } },
+	{ { PLAYER3_CIRCLE6,0 } },
+	{ { PLAYER3_CIRCLE7,0 } },
+	{ { PLAYER3_CIRCLE8,0 } },
+
+	{ { PLAYER4_CIRCLE1,0 } },
+	{ { PLAYER4_CIRCLE2,0 } },
+	{ { PLAYER4_CIRCLE3,0 } },
+	{ { PLAYER4_CIRCLE4,0 } },
+	{ { PLAYER4_CIRCLE5,0 } },
+	{ { PLAYER4_CIRCLE6,0 } },
+	{ { PLAYER4_CIRCLE7,0 } },
+	{ { PLAYER4_CIRCLE8,0 } }
 }
 };
 
