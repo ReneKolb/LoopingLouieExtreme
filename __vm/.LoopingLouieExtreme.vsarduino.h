@@ -87,6 +87,7 @@ extern "C" void __cxa_pure_virtual() {;}
 #include <Adafruit_MCP23017.h>
 #include <defines.h>
 #include <gameLoops.ino>
+#include <serialInputHandler.ino>
 #include <setupRoutines.ino>
 #include <timer.h>
 #endif

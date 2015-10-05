@@ -406,6 +406,7 @@ void setup()
 //	digitalWrite(PIN_ADDRESS GLOBAL_IR, LOW);
 }
 
+/*
 int received;
 long received_LONG;
 int data;
@@ -468,7 +469,7 @@ void handleSerialInput() {
 			Log("2: " + (String)analogRead(PlayerIRPins[value - 1][2].pin - 100));
 		}
 	}
-}
+}*/
 
 void loop()
 {

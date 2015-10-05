@@ -129,6 +129,7 @@
     <None Include="LoopingLouieExtreme.ino">
       <FileType>CppCode</FileType>
     </None>
+    <None Include="serialInputHandler.ino" />
     <None Include="setupRoutines.ino">
       <FileType>CppCode</FileType>
     </None>

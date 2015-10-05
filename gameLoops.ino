@@ -118,7 +118,7 @@ void handleSpecialButton(uint8_t player) {
 
 uint16_t calcAnimationDelay(uint8_t motorSpeed) {
 	uint16_t newDelay = map(motorSpeed, MIN_MOTOR_SPEED, MAX_MOTOR_SPEED-50, 87, 20);
-	Log("new Delay: "+(String) newDelay);
+	Log("new Animation Delay: "+(String) newDelay);
 	return newDelay;
 }
 

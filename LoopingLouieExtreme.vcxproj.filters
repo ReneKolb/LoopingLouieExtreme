@@ -20,6 +20,7 @@
     <None Include="timer.h" />
     <None Include="setupRoutines.ino" />
     <None Include="gameLoops.ino" />
+    <None Include="serialInputHandler.ino" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="__vm\.LoopingLouieExtreme.vsarduino.h">
