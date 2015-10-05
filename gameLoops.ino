@@ -4,18 +4,15 @@ enum GameState {
 	OUTRO
 };
 
-enum SpecialItemType {
-	TURBO,
-	SLOW
-};
+
 
 #define SPECIAL_COOLDOWN 5000
 #define TURBO_DURATION 300
 #define SLOW_DURATION 1000 // 500
 
 //Game Settings
-boolean enableSpecialItems = true;
-boolean enableEvents = true;
+//boolean enableSpecialItems = true;
+//boolean enableEvents = true;
 
 unsigned long gameStartCountdown;
 int countdownAnimation;
@@ -34,7 +31,7 @@ unsigned long eventTmr;
 
 unsigned long playerSpecialCooldownTmr[4];
 uint8_t playerSpecialItemAmount[4];
-SpecialItemType playerSpecialItemType[4];
+//SpecialItemType playerSpecialItemType[4];
 
 unsigned long turboTmr;
 unsigned long slowTmr;
@@ -43,7 +40,11 @@ unsigned long recheckTmr[4];
 
 uint8_t chipCount[4];
 
+uint8_t currentChefIndex;
+unsigned long chefChangeTmr;
+
 uint8_t currentMotorSpeed;
+boolean currentMotorDirection; //true = forward
 unsigned long motorSpeedChangeTmr;
 uint16_t motorSpeedChangeDelay;
 
@@ -63,7 +64,7 @@ void enablePlayer(uint8_t player) {
 	enabledPlayer[player - 1] = true;
 	chipCount[player - 1] = 3;
 
-	if (enableSpecialItems) {
+	if (gameSettings.enableItems) {
 		updatePlayerBoosterLEDs(player, 4);
 		digitalWrite(SpecialButtonLED[player-1], 255);
 	}
@@ -75,12 +76,20 @@ void enablePlayer(uint8_t player) {
 
 void handleTurbo() {
 	turboTmr = millis();
-	setMotorSpeed(true, MAX_MOTOR_SPEED);
+	setMotorSpeed(currentMotorDirection, MAX_MOTOR_SPEED);
 }
 
 void handleSlow() {
 	slowTmr = millis();
 	setMotorSpeed(true, 0);
+}
+
+void handleDirectionChange() {
+	currentMotorDirection = !currentMotorDirection; 
+	if (!currentMotorDirection && currentMotorSpeed > 100) {
+		currentMotorSpeed = 100; //limit backward speed to 100
+	}
+	setMotorSpeed(currentMotorDirection, currentMotorSpeed);
 }
 
 void handleSpecialButton(uint8_t player) {
@@ -92,12 +101,15 @@ void handleSpecialButton(uint8_t player) {
 			updatePlayerBoosterLEDs(player, playerSpecialItemAmount[player - 1]);
 			digitalWrite(SpecialButtonLED[player - 1], 0);
 			
-			switch (playerSpecialItemType[player - 1]) {
+			switch (gameSettings.itemType[player - 1]) {
 			case TURBO:
 				handleTurbo();
 				break;
 			case SLOW:
 				handleSlow();
+				break;
+			case CHANGE_DIR:
+				handleDirectionChange();
 				break;
 			}
 		}
@@ -119,7 +131,8 @@ void initGame() {
 	countdownAnimation = -1;
 	motorSpeedChangeTmr = millis();
 	motorSpeedChangeDelay = 4000 + random(4000);
-	currentMotorSpeed = NORMAL_MOTOR_SPEED;
+	currentMotorSpeed = gameSettings.startSpeed;
+	currentMotorDirection = true;
 	animationDelay = calcAnimationDelay(currentMotorSpeed);
 	animationStep = -1;
 	animationTmr = millis();
@@ -145,10 +158,10 @@ void initGame() {
 	playerSpecialItemAmount[2] = 4;
 	playerSpecialItemAmount[3] = 4;
 
-	playerSpecialItemType[0] = TURBO;
+	/*playerSpecialItemType[0] = TURBO;
 	playerSpecialItemType[1] = SLOW;
 	playerSpecialItemType[2] = TURBO;
-	playerSpecialItemType[3] = SLOW;
+	playerSpecialItemType[3] = SLOW;*/
 
 	turboTmr = 0;
 	slowTmr = 0;
@@ -206,6 +219,16 @@ void initGame() {
 		return;
 		//gameState = COUNTDOWN;
 	}
+
+	if (gameSettings.chefMode) {
+		//determine 1st chef
+		//TODO: vllt könnte man hier ein minigame draus machen
+		do {
+			currentChefIndex = random(4);
+		} while (!enabledPlayer[currentChefIndex]);
+		//display chef
+		Log("new Chef: " + (String)(currentChefIndex + 1));
+	}
 }
 
 void gameLoop() {
@@ -215,10 +238,11 @@ void gameLoop() {
 			countdownAnimation++;
 			if (countdownAnimation >= 8) {
 				gameState = RUNNING;
-				setMotorSpeed(true, currentMotorSpeed);
+				setMotorSpeed(currentMotorDirection, currentMotorSpeed);
 				// reset/start Timers
 				motorSpeedChangeTmr = millis();
 				eventDelayTmr = millis(); 
+				chefChangeTmr = millis();
 				Log("Countdown done -> start");
 			}
 			else {
@@ -228,18 +252,17 @@ void gameLoop() {
 		}
 		break;
 	case RUNNING:
-
 		if (turboTmr != 0) {
 			if ((unsigned long)(millis() - turboTmr) > TURBO_DURATION) {
 				turboTmr = 0;
-				setMotorSpeed(true, currentMotorSpeed);
+				setMotorSpeed(currentMotorDirection, currentMotorSpeed);
 			}
 		}
 
 		if (slowTmr != 0) {
 			if ((unsigned long)(millis() - slowTmr) > SLOW_DURATION) {
 				slowTmr = 0;
-				setMotorSpeed(true, currentMotorSpeed);
+				setMotorSpeed(currentMotorDirection, currentMotorSpeed);
 			}
 		}
 
@@ -287,7 +310,7 @@ void gameLoop() {
 					}
 				}
 
-				if (playerSpecialCooldownTmr[i] != 0 && (unsigned long) (millis()-playerSpecialCooldownTmr[i]) >= SPECIAL_COOLDOWN ) {
+				if (playerSpecialCooldownTmr[i] != 0 && (unsigned long) (millis()-playerSpecialCooldownTmr[i]) >= ((gameSettings.chefMode&&currentChefIndex==i&&gameSettings.chefHasShorterCooldown)?(SPECIAL_COOLDOWN/3):SPECIAL_COOLDOWN) ) {
 					playerSpecialCooldownTmr[i] = 0;
 					if (playerSpecialItemAmount[i] > 0) {
 						//nur rote LED anschalten, wenn noch Items übrig sind
@@ -295,86 +318,155 @@ void gameLoop() {
 					}
 				}
 
-				if (enableSpecialItems && eventTmr == 0) {
+				if (gameSettings.enableItems && eventTmr == 0) {
 					//only when no event is in progress, a player can use special items
 					if (isButtonPressed(SpecialButton[i])) {
 						handleSpecialButton(i + 1);
 					}
+
+					//to prevent spamming + - speed buttons: start special cooldown
+					/*if (isButtonPressed(SpeedButton[i][0]) || isButtonPressed(SpeedButton[i][1])) {
+						playerSpecialCooldownTmr[i] = millis();
+						digitalWrite(SpecialButtonLED[i], 0);
+					}*/
 				}
 
-				//to prevent spamming + - speed buttons: start special cooldown
-				if (eventTmr==0 && (isButtonPressed(SpeedButton[i][0])||isButtonPressed(SpeedButton[i][1]))) {
-					playerSpecialCooldownTmr[i] = millis();
-					digitalWrite(SpecialButtonLED[i], 0);
+				//handle chef mode!!
+				if (gameSettings.chefMode && currentChefIndex == i) {
+					if (isButtonPressed(SpeedButton[i][0])) {
+						//Inc speed Button
+						if ((unsigned long)(millis() - motorSpeedChangeTmr) > 50) {
+							motorSpeedChangeTmr = millis();
+							currentMotorSpeed += 1;
+							if (currentMotorSpeed < MIN_MOTOR_SPEED) {
+								currentMotorSpeed = MIN_MOTOR_SPEED;
+							}
+							if (currentMotorSpeed > MAX_MOTOR_SPEED - 30) {
+								currentMotorSpeed = MAX_MOTOR_SPEED - 30;
+							}
+							setMotorSpeed(currentMotorDirection, currentMotorSpeed);
+						}
+					}
+					else if (isButtonPressed(SpeedButton[i][1])) {
+						//Dec speed Button
+						if ((unsigned long)(millis() - motorSpeedChangeTmr) > 50) {
+							motorSpeedChangeTmr = millis();
+							currentMotorSpeed -= 1;
+							if (currentMotorSpeed < MIN_MOTOR_SPEED + 20) {
+								currentMotorSpeed = MIN_MOTOR_SPEED + 20;
+							}
+							if (currentMotorSpeed > MAX_MOTOR_SPEED - 50) {
+								currentMotorSpeed = MAX_MOTOR_SPEED - 50;
+							}
+							setMotorSpeed(currentMotorDirection, currentMotorSpeed);
+						}
+					}
 				}
-			
+		
 			} // end if(enabledPlayer)
 		} // end iterating players
 
-		if ((unsigned long)(millis() - eventDelayTmr) > eventDelay) {
-			//executeEvent
-			eventDelayTmr = millis();
-			eventDelay = EVENT_DURATION + 4500 + random(7000);
-			eventTmr = millis();
+		  // ********** handle events **********
+		if (gameSettings.enableEvents) {
+			if ((unsigned long)(millis() - eventDelayTmr) > eventDelay) {
+				//executeEvent
+				eventDelayTmr = millis();
+				eventDelay = EVENT_DURATION + 4500 + random(7000);
+				eventTmr = millis();
 
-			//signalize that an event has started
-			fullOff(false, false);
-		}
+				//signalize that an event has started
+				fullOff(false, false);
+			}
 
-		if (eventTmr != 0) {
-			if ((unsigned long)(millis() - eventTmr) > EVENT_DURATION) {
-				eventTmr = 0; //cancel event
-				//TEST
-				for (int i = 0; i < 4;i++) {
-					if (enabledPlayer[i]) {
-						for (int l = 0; l < 5;l++) {
-							digitalWrite(playerMiddleColors[i][l],255);
+			if (eventTmr != 0) {
+				if ((unsigned long)(millis() - eventTmr) > EVENT_DURATION) {
+					eventTmr = 0; //cancel event
+					//TEST
+					for (int i = 0; i < 4; i++) {
+						if (enabledPlayer[i]) {
+							for (int l = 0; l < 5; l++) {
+								digitalWrite(playerMiddleColors[i][l], 255);
+							}
+							setColor(i + 1, PlayerColor[i]);
 						}
-						setColor(i+1,PlayerColor[i]);
+					}
+				}
+				else {
+					for (int i = 1; i <= 4; i++) {
+						if (checkButtons(i)) {
+							//end event -> a player has pressed a button
+							eventTmr = 0;
+							playerSpecialItemAmount[i - 1]++;
+							//play Effect
+							if (playerSpecialItemAmount[i - 1] > 4) {
+								playerSpecialItemAmount[i - 1] = 4;
+							}
+							else {
+								updatePlayerBoosterLEDs(i, playerSpecialItemAmount[i - 1]);
+							}
+
+							for (int i = 0; i < 4; i++) {
+								if (enabledPlayer[i]) {
+									for (int l = 0; l < 5; l++) {
+										digitalWrite(playerMiddleColors[i][l], 255);
+									}
+									setColor(i + 1, PlayerColor[i]);
+								}
+							}
+							break;
+						}
 					}
 				}
 			}
-			else {
-				for (int i = 1; i <= 4; i++) {
-					if (checkButtons(i)) {
-						//end event -> a player has pressed a button
-						eventTmr = 0;
-						playerSpecialItemAmount[i - 1]++;
-						//play Effect
-						if (playerSpecialItemAmount[i - 1] > 4) {
-							playerSpecialItemAmount[i - 1] = 4;
-						}
-						else {
-							updatePlayerBoosterLEDs(i, playerSpecialItemAmount[i - 1]);
-						}
+		}
 
-						for (int i = 0; i < 4; i++) {
-							if (enabledPlayer[i]) {
-								for (int l = 0; l < 5; l++) {
-									digitalWrite(playerMiddleColors[i][l], 255);
-								}
-								setColor(i + 1, PlayerColor[i]);
+		// ********** handle random Speed **********
+		//chef mode disables random Speed!!
+		if (gameSettings.randomSpeed && !gameSettings.chefMode) {
+			if ((unsigned long)(millis() - motorSpeedChangeTmr)>motorSpeedChangeDelay) {
+				motorSpeedChangeTmr = millis();
+				motorSpeedChangeDelay = gameSettings.speedMinDelay + random(gameSettings.speedMaxDelay-gameSettings.speedMinDelay+1);
+
+				if (gameSettings.enableReverse) {
+					if (!currentMotorDirection) {
+						currentMotorDirection = true; //change from backward to forward
+					}
+					else {
+						if (random(4) == 0) {
+							//25% chance of turing backward
+							currentMotorDirection = false;
+							if (currentMotorSpeed > 100) {
+								currentMotorSpeed = 100; //limit initial backward speed to 100
 							}
 						}
-						break;
 					}
 				}
-			}
-		}
 
-		if ((unsigned long)(millis() - motorSpeedChangeTmr)>motorSpeedChangeDelay) {
-			motorSpeedChangeTmr = millis();
-			motorSpeedChangeDelay = 4000 + random(4000);
-			currentMotorSpeed += random(60) - 30; //Speed change (+- 30)
-			if (currentMotorSpeed < MIN_MOTOR_SPEED) {
-				currentMotorSpeed = MIN_MOTOR_SPEED;
-			}
-			if (currentMotorSpeed > MAX_MOTOR_SPEED - 50) {
-				currentMotorSpeed = MAX_MOTOR_SPEED - 50;
-			}
+				//50:50 chance of increase or decrease the speed
+				currentMotorSpeed += (random(2) == 0) ? (gameSettings.speedMinStepSize + random(gameSettings.speedMaxStepSize - gameSettings.speedMinStepSize + 1)) : -(gameSettings.speedMinStepSize + random(gameSettings.speedMaxStepSize - gameSettings.speedMinStepSize + 1));
+				if (currentMotorSpeed < MIN_MOTOR_SPEED+20) {
+					currentMotorSpeed = MIN_MOTOR_SPEED+20;
+				}
+				if (currentMotorSpeed > MAX_MOTOR_SPEED - 50) {
+					currentMotorSpeed = MAX_MOTOR_SPEED - 50;
+				}
 
-			animationDelay = calcAnimationDelay(currentMotorSpeed);
-			setMotorSpeed(true, currentMotorSpeed);
+				animationDelay = calcAnimationDelay(currentMotorSpeed);
+				setMotorSpeed(currentMotorDirection, currentMotorSpeed);
+			}
+		}//end random speed
+
+		if (gameSettings.chefMode && gameSettings.chefRoulette) {
+			if ((unsigned long)(millis() - chefChangeTmr) > gameSettings.chefChangeDelay) {
+				chefChangeTmr = millis();
+				uint8_t oldChefIndex = currentChefIndex;
+				do {
+					currentChefIndex = random(4);
+				} while (!enabledPlayer[currentChefIndex] || oldChefIndex == currentChefIndex );
+
+				//display new Chef
+				Log("new Chef: "+(String)(currentChefIndex+1));
+			}
 		}
 
 		if (eventTmr == 0) {

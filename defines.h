@@ -591,9 +591,38 @@ const Animation<64, 1> nochntest = { 21,
 }
 };
 
+enum SpecialItemType {
+	TURBO,
+	SLOW,
+	CHANGE_DIR
+};
+
+struct GameSettings{
+	//Speed Settings
+	bool randomSpeed;
+	uint8_t startSpeed;
+	int speedMinDelay; //0 means: delay between speed steps is always the same
+	int speedMaxDelay;
+	int speedMinStepSize;
+	int speedMaxStepSize; 
+	bool enableReverse;
+
+	//Chef Mode
+	bool chefMode;
+	bool chefRoulette;     //könnte man zusammenfassen
+	uint16_t chefChangeDelay; // indem man chefDelay auf 0 setzt und != 0
+	bool chefHasShorterCooldown;
+
+	bool enableItems;
+	SpecialItemType itemType[4];
+	bool enableEvents;
+
+	uint16_t itemAutoRefillDelay; // 0: no refill
+	uint16_t itemCooldownDelay; //individuell für jeden ItemTyp ?
+	bool alternateCooldownMode; //true: erst wenn alle spieler ein item eingesetzt haben, können die anderen wieder ein item einsetzen
 
 
-
+};
 
 
 

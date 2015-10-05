@@ -20,7 +20,7 @@ Adafruit_MCP23017 mcpUVLEDs;      // IO-Expander for UV-LEDs
 Adafruit_MCP23017 mcpCircle1LEDs; // IO-Expander for Circle-LEDs
 Adafruit_MCP23017 mcpCircle2LEDs; // IO-Expander for Circle-LEDs
 
-
+GameSettings gameSettings;
 
 void Log(String msg) {
 	if (DEBUG) {
@@ -320,6 +320,35 @@ void idleAnimations() {
 	}*/
 }
 
+void loadDefaultGameSettings() {
+	//Speed Settings
+	gameSettings.randomSpeed = false;
+	gameSettings.startSpeed = NORMAL_MOTOR_SPEED;
+	gameSettings.speedMinDelay = 5000; //0 means: delay between speed steps is always the same
+	gameSettings.speedMaxDelay = 12000;
+	gameSettings.speedMinStepSize = 7;
+	gameSettings.speedMaxStepSize = 30;
+	gameSettings.enableReverse = true;
+
+	//Chef Mode
+	gameSettings.chefMode = true;
+	gameSettings.chefRoulette = true;     //könnte man zusammenfassen
+	gameSettings.chefChangeDelay = 7000; // indem man chefDelay auf 0 setzt und != 0
+	gameSettings.chefHasShorterCooldown = true;
+
+	gameSettings.enableItems = true;
+	gameSettings.enableEvents= true;
+
+	gameSettings.itemType[0] = TURBO;
+	gameSettings.itemType[1] = SLOW;
+	gameSettings.itemType[2] = CHANGE_DIR;
+	gameSettings.itemType[3] = SLOW;
+
+	gameSettings.itemAutoRefillDelay = 0; // 0: no refill
+	gameSettings.itemCooldownDelay = 5000; //individuell für jeden ItemTyp ?
+	gameSettings.alternateCooldownMode = false; //true: erst wenn alle spieler ein item eingesetzt haben, können die anderen wieder ein item einsetzen
+}
+
 void setup()
 {
 	if (DEBUG) {
@@ -368,6 +397,8 @@ void setup()
 	state = IDLE;
 	standbyTmr = millis();
 	randomSeed(analogRead(1)*micros());
+
+	loadDefaultGameSettings();
 
 	Log("setup done.");
 
