@@ -495,6 +495,19 @@ void loop()
 			//switch all LEDs off
 			fullOff();
 		}
+
+		if (isButtonPressed(SpecialButton[0]) || isButtonPressed(SpecialButton[1]) || isButtonPressed(SpecialButton[2]) || isButtonPressed(SpecialButton[3])) {
+			if (pressStartTmr == 0) {
+				pressStartTmr = millis();
+			}
+			else if ((unsigned long)(millis() - pressStartTmr)>PRESS_START_DELAY) {
+				pressStartTmr = 0;
+				initGame();
+			}
+		}else{
+			pressStartTmr = 0;
+		}
+		
 		break;
 	case GAME:
 		//gameLoop();
