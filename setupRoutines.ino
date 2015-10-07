@@ -192,7 +192,7 @@ void setupMiddleColorLEDS() {
 
 	for (int p = 0; p < 4; p++) {
 		for (int l = 0; l <= 5; l++) {
-			digitalWrite(playerMiddleColors[p][l], HIGH);
+			digitalWrite(playerMiddleColors[getPinIndex(p,l, MAX_LEDS_MIDDLE)], HIGH);
 		}
 	}
 }

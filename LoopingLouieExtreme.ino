@@ -134,10 +134,12 @@ boolean checkButtons() {
 void updatePlayerBoosterLEDs(const uint8_t player, const uint8_t amount) {
 	for (int i = 0; i < 4; i++) {
 		if (amount > i) {
-			digitalWrite(BOOSTER_LEDS[player - 1][i], HIGH);
+			//digitalWrite(BOOSTER_LEDS[player - 1][i], HIGH);
+			digitalWrite(BOOSTER_LEDS[getPinIndex(player-1,i,MAX_LEDS_BOOSTER)], HIGH);
 		}
 		else {
-			digitalWrite(BOOSTER_LEDS[player - 1][i], LOW);
+			//digitalWrite(BOOSTER_LEDS[player - 1][i], LOW);
+			digitalWrite(BOOSTER_LEDS[getPinIndex(player - 1, i, MAX_LEDS_BOOSTER)], LOW);
 		}
 	}
 }
@@ -161,9 +163,9 @@ uint8_t getPlayerChipAmount(uint8_t player) {
 }
 
 void setColor(const uint8_t player, const uint8_t r, const uint8_t g, const uint8_t b) {
-	analogWrite(RGB_LEDS[player - 1][0], r);
-	analogWrite(RGB_LEDS[player - 1][1], g);
-	analogWrite(RGB_LEDS[player - 1][2], b);
+	analogWrite(RGB_LEDS[getPinIndex(player - 1, 0, MAX_LEDS_RGB)], r);
+	analogWrite(RGB_LEDS[getPinIndex(player - 1, 1, MAX_LEDS_RGB)], g);
+	analogWrite(RGB_LEDS[getPinIndex(player - 1, 2, MAX_LEDS_RGB)], b);
 }
 
 void setColor(const uint8_t player, const Color color) {
@@ -190,17 +192,18 @@ void DoAnimationStep(const AnimationStep leds[], int amount) {
 void fullOn() {
 	for (int p = 0; p < 4; p++) {
 		for (int l = 0; l < 4; l++) {
-			digitalWrite(BOOSTER_LEDS[p][l], 255);
-			digitalWrite(UVLEDs[p][l], 255);
+			//digitalWrite(BOOSTER_LEDS[p][l], 255);
+			digitalWrite(BOOSTER_LEDS[getPinIndex(p, l, MAX_LEDS_BOOSTER)], 255);
+			digitalWrite(UVLEDs[getPinIndex(p,l, MAX_LEDS_UV)], 255);
 		}
 		for (int l = 0; l < 3; l++) {
-			digitalWrite(RGB_LEDS[p][l], 255);
+			digitalWrite(RGB_LEDS[getPinIndex(p,l, MAX_LEDS_RGB)], 255);
 		}
 		for (int l = 0; l < 5; l++) {
-			digitalWrite(playerMiddleColors[p][l], 255);
+			digitalWrite(playerMiddleColors[getPinIndex(p,l, MAX_LEDS_MIDDLE)], 255);
 		}
 		for (int l = 0; l < 8; l++) {
-			digitalWrite(playerCircle[p][l], 255);
+			digitalWrite(playerCircle[getPinIndex(p,l, MAX_LEDS_CIRCLE)], 255);
 		}
 		digitalWrite(SpecialButtonLED[p], 255);
 	}
@@ -211,18 +214,19 @@ void fullOff(boolean includeBoosterLEDs, boolean includeIR) {
 	for (int p = 0; p < 4; p++) {
 		for (int l = 0; l < 4; l++) {
 			if (includeBoosterLEDs) {
-				digitalWrite(BOOSTER_LEDS[p][l], 0);
+				//digitalWrite(BOOSTER_LEDS[p][l], 0);
+				digitalWrite(BOOSTER_LEDS[getPinIndex(p, l, MAX_LEDS_BOOSTER)],0);
 			}
-			digitalWrite(UVLEDs[p][l], 0);
+			digitalWrite(UVLEDs[getPinIndex(p,l, MAX_LEDS_UV)], 0);
 		}
 		for (int l = 0; l < 3; l++) {
-			digitalWrite(RGB_LEDS[p][l], 0);
+			digitalWrite(RGB_LEDS[getPinIndex(p,l, MAX_LEDS_RGB)], 0);
 		}
 		for (int l = 0; l < 5; l++) {
-			digitalWrite(playerMiddleColors[p][l], 0);
+			digitalWrite(playerMiddleColors[getPinIndex(p,l, MAX_LEDS_MIDDLE)], 0);
 		}
 		for (int l = 0; l < 8; l++) {
-			digitalWrite(playerCircle[p][l], 0);
+			digitalWrite(playerCircle[getPinIndex(p,l, MAX_LEDS_CIRCLE)], 0);
 		}
 		if (includeBoosterLEDs) {
 			digitalWrite(SpecialButtonLED[p], 0);
@@ -402,7 +406,7 @@ void setup()
 
 	Log("setup done.");
 
-	fullOn();
+	//fullOn();
 //	digitalWrite(PIN_ADDRESS GLOBAL_IR, LOW);
 }
 
@@ -471,8 +475,12 @@ void handleSerialInput() {
 	}
 }*/
 
+//unsigned long startTime;
+
 void loop()
 {
+	//startTime = millis();
+
 	switch (state) {
 	case STANDBY:
 		//any pressed button awakes from standby
@@ -524,4 +532,9 @@ void loop()
 	if (DEBUG) {
 		handleSerialInput();
 	}
+
+/*	unsigned long cycleTime = (millis() - startTime);
+	if (cycleTime > 5) {
+		Log("Cycle Time: " + (String)cycleTime);
+	}*/
 }

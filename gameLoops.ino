@@ -53,10 +53,10 @@ uint8_t winner;
 void enablePlayer(uint8_t player) {
 	setColor(player, PlayerColor[player - 1]);
 	for (int l = 0; l < 4; l++) {
-		digitalWrite(UVLEDs[player-1][l],255);
+		digitalWrite(UVLEDs[getPinIndex(player-1,l, MAX_LEDS_UV)],255);
 	}
 	for (int l = 0; l < 5; l++) {
-		digitalWrite(playerMiddleColors[player-1][l], 255);
+		digitalWrite(playerMiddleColors[getPinIndex(player-1,l, MAX_LEDS_MIDDLE)], 255);
 	}
 	if (!enabledPlayer[player - 1]) {
 		playerCount++;
@@ -286,7 +286,7 @@ void gameLoop() {
 								enabledPlayer[i] = false;
 								//TEST: disable Player LEDs
 								for (int l = 0; l < 5; l++) {
-									digitalWrite(playerMiddleColors[i][l],0);
+									digitalWrite(playerMiddleColors[getPinIndex(i,l, MAX_LEDS_MIDDLE)],0);
 								}
 								setColor(i + 1, Color BLACK);
 								playerCount--;
@@ -385,7 +385,7 @@ void gameLoop() {
 					for (int i = 0; i < 4; i++) {
 						if (enabledPlayer[i]) {
 							for (int l = 0; l < 5; l++) {
-								digitalWrite(playerMiddleColors[i][l], 255);
+								digitalWrite(playerMiddleColors[getPinIndex(i,l, MAX_LEDS_MIDDLE)], 255);
 							}
 							setColor(i + 1, PlayerColor[i]);
 						}
@@ -408,7 +408,7 @@ void gameLoop() {
 							for (int i = 0; i < 4; i++) {
 								if (enabledPlayer[i]) {
 									for (int l = 0; l < 5; l++) {
-										digitalWrite(playerMiddleColors[i][l], 255);
+										digitalWrite(playerMiddleColors[getPinIndex(i,l, MAX_LEDS_MIDDLE)], 255);
 									}
 									setColor(i + 1, PlayerColor[i]);
 								}

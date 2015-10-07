@@ -235,6 +235,10 @@ void fillBuffer() {
 	readSize = Serial.readBytesUntil('.', buffer, 6);
 }
 
+//DEBUG
+int pIndex = 0;
+int lIndex = -1;
+
 void handleSerialInput() {
 	if (Serial.available()) {
 		//first char is action type
