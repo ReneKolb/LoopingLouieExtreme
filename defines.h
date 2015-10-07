@@ -41,7 +41,7 @@ const PIN_ADDRESS NONE = { 255, 255 };
 	//playerIndex: 0..3
 	return (playerIndex * maxLeds) + pinIndex;
 }*/
-#define getPinIndex(playerIndex, pinIndex, maxLeds) ((playerIndex * maxLeds) + pinIndex)
+#define getPinIndex(playerIndex, pinIndex, maxLeds) (((playerIndex) * maxLeds) + (pinIndex))
 
 //                       [Player][LED] 
 /*const PIN_ADDRESS BOOSTER_LEDS[4][4] = {
@@ -688,6 +688,7 @@ struct NewAnimation
 	PIN_ADDRESS *pPinList;
 	int startIndex;
 	int endIndex;
+	//AnimationType animType; //blink, forward, backward
 	bool blink; //lauflicht, oder alle gleichzeitig blinken
 	int delay;
 };
