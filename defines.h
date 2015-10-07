@@ -36,12 +36,12 @@ const PIN_ADDRESS NONE = { 255, 255 };
 #define PLAYER4_BOOSTER3				{ 1, 2 }
 #define PLAYER4_BOOSTER4				{ 1, 3 }
 
-
 //converts old 2d array indices to 1d index
-int getPinIndex(uint8_t playerIndex, uint8_t pinIndex, uint8_t maxLeds) {
+/*int getPinIndex(uint8_t playerIndex, uint8_t pinIndex, uint8_t maxLeds) {
 	//playerIndex: 0..3
 	return (playerIndex * maxLeds) + pinIndex;
-}
+}*/
+#define getPinIndex(playerIndex, pinIndex, maxLeds) ((playerIndex * maxLeds) + pinIndex)
 
 //                       [Player][LED] 
 /*const PIN_ADDRESS BOOSTER_LEDS[4][4] = {
