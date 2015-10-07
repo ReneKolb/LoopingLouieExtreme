@@ -51,7 +51,7 @@ const PIN_ADDRESS NONE = { 255, 255 };
 	{ PLAYER4_BOOSTER1,  PLAYER4_BOOSTER2,  PLAYER4_BOOSTER3,  PLAYER4_BOOSTER4 }
 };*/
 #define MAX_LEDS_BOOSTER 4
-const PIN_ADDRESS BOOSTER_LEDS[16] = {
+static const PIN_ADDRESS BOOSTER_LEDS[16] = {
 	 PLAYER1_BOOSTER1,  PLAYER1_BOOSTER2,  PLAYER1_BOOSTER3,  PLAYER1_BOOSTER4,
 	 PLAYER2_BOOSTER1,  PLAYER2_BOOSTER2,  PLAYER2_BOOSTER3,  PLAYER2_BOOSTER4,
 	 PLAYER3_BOOSTER1,  PLAYER3_BOOSTER2,  PLAYER3_BOOSTER3,  PLAYER3_BOOSTER4,
@@ -77,7 +77,7 @@ const PIN_ADDRESS BOOSTER_LEDS[16] = {
 
 //                   [Player][Color]
 #define MAX_LEDS_RGB 3
-const PIN_ADDRESS RGB_LEDS[12] = {
+static const PIN_ADDRESS RGB_LEDS[12] = {
 	 PLAYER1_COLOR_R,  PLAYER1_COLOR_G,  PLAYER1_COLOR_B,
 	 PLAYER2_COLOR_R,  PLAYER2_COLOR_G,  PLAYER2_COLOR_B,
 	 PLAYER3_COLOR_R,  PLAYER3_COLOR_G,  PLAYER3_COLOR_B,
@@ -165,7 +165,7 @@ const PIN_ADDRESS PlayerIRPins[4][3] =	{ { PIN_PLAYER1_IR1 ,PIN_PLAYER1_IR2 ,PIN
 #define PLAYER4_UV4						{ 2, 3 }
 
 #define MAX_LEDS_UV 4
-const PIN_ADDRESS UVLEDs[16] = {
+static const PIN_ADDRESS UVLEDs[16] = {
 	 PLAYER1_UV1, PLAYER1_UV2, PLAYER1_UV3, PLAYER1_UV4,
 	 PLAYER2_UV1, PLAYER2_UV2, PLAYER2_UV3, PLAYER2_UV4,
 	 PLAYER3_UV1, PLAYER3_UV2, PLAYER3_UV3, PLAYER3_UV4,
@@ -202,7 +202,7 @@ const PIN_ADDRESS UVLEDs[16] = {
 #define PIN_PLAYER4_LED5				{ 0, 25 }
 
 #define MAX_LEDS_MIDDLE 5
-const PIN_ADDRESS playerMiddleColors[20] = {
+static const PIN_ADDRESS playerMiddleColors[20] = {
 	 PIN_PLAYER1_LED1, PIN_PLAYER1_LED2, PIN_PLAYER1_LED3, PIN_PLAYER1_LED4, PIN_PLAYER1_LED5,
 	 PIN_PLAYER2_LED1, PIN_PLAYER2_LED2, PIN_PLAYER2_LED3, PIN_PLAYER2_LED4, PIN_PLAYER2_LED5,
 	 PIN_PLAYER3_LED1, PIN_PLAYER3_LED2, PIN_PLAYER3_LED3, PIN_PLAYER3_LED4, PIN_PLAYER3_LED5,
@@ -251,7 +251,7 @@ const PIN_ADDRESS playerMiddleColors[20] = {
 #define PLAYER4_CIRCLE8					{4,7}
 
 #define MAX_LEDS_CIRCLE 8
-const PIN_ADDRESS playerCircle[32] = {
+static const PIN_ADDRESS playerCircle[32] = {
 	 PLAYER1_CIRCLE1, PLAYER1_CIRCLE2, PLAYER1_CIRCLE3, PLAYER1_CIRCLE4, PLAYER1_CIRCLE5,PLAYER1_CIRCLE6,PLAYER1_CIRCLE7,PLAYER1_CIRCLE8,
 	 PLAYER2_CIRCLE1, PLAYER2_CIRCLE2, PLAYER2_CIRCLE3, PLAYER2_CIRCLE4, PLAYER2_CIRCLE5,PLAYER2_CIRCLE6,PLAYER2_CIRCLE7,PLAYER2_CIRCLE8,
 	 PLAYER3_CIRCLE1, PLAYER3_CIRCLE2, PLAYER3_CIRCLE3, PLAYER3_CIRCLE4, PLAYER3_CIRCLE5,PLAYER3_CIRCLE6,PLAYER3_CIRCLE7,PLAYER3_CIRCLE8,
@@ -680,15 +680,42 @@ boolean currentDirection // true=foreward; false=backward
 };
 */
 
+enum AnimationType
+{
+	BLINK, FORWARD, BACKWARD, FORBACKWARD, FILLFORWARD, FILLBACKWARD, FILLFORBACKWARD
+};
+
 
 //tests for new animations
-//TODO: flat (2d -> 1d) all pin arrays!!
 struct NewAnimation
 {
-	PIN_ADDRESS *pPinList;
+	const PIN_ADDRESS *pPinList;
 	int startIndex;
 	int endIndex;
-	//AnimationType animType; //blink, forward, backward
-	bool blink; //lauflicht, oder alle gleichzeitig blinken
+	AnimationType animType;
 	int delay;
 };
+
+struct AnimationTmr {
+	unsigned long tmr;
+	int currentIndex;
+};
+
+NewAnimation AnimationDB[] = {
+	{ playerCircle,       0,  31, BACKWARD,     20 },
+	{ playerMiddleColors, 0,  19, FORWARD,     32 },
+	//Booster Display Animation
+	{ BOOSTER_LEDS,       0,  3,  FILLFORWARD, 100 },
+	{ BOOSTER_LEDS,       4,  7,  FILLBACKWARD, 100 },
+	{ BOOSTER_LEDS,       8,  11, FILLFORBACKWARD, 100 },
+	{ BOOSTER_LEDS,       12, 15, FORBACKWARD, 100 },
+	{ UVLEDs,             0,  15, BLINK,       1500}
+};
+
+// TODO: COLOR!!!
+
+AnimationTmr animationTimers[10] = { {0,-1},{ 0,-1 } ,{ 0,-1 } ,{ 0,-1 } ,{ 0,-1 } ,{ 0,-1 } ,{ 0,-1 } ,{ 0,-1 } ,{ 0,-1 } ,{ 0,-1 } }; //max 10 animations at a time
+int currentAnimations[10] = {0, 1, 2, 3, 4 , 5 , 6 ,-1 ,-1 ,-1 }; //indices of the Animation in AnimationDB.
+
+
+

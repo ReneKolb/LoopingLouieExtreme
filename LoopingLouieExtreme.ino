@@ -323,6 +323,118 @@ void idleAnimations() {
 		DoAnimationStep(nochntest.LEDs[idleAnimationStep[7]], nochntest.maxLED);
 	}*/
 }
+void newIdleAnimations() {
+	int oldIndex; //rename to offIndex
+	int newIndex; //rename to onIndex
+	for (int i = 0; i < 10;i++) {
+		if (currentAnimations[i] != -1) {
+			if ((unsigned long)(millis() - animationTimers[i].tmr)>AnimationDB[currentAnimations[i]].delay) {
+				animationTimers[i].tmr = millis();
+				switch (AnimationDB[currentAnimations[i]].animType) {
+				case BLINK:
+					oldIndex = -1;
+					newIndex = -1;
+					if (++animationTimers[i].currentIndex >= 1) {
+						animationTimers[i].currentIndex = -1;
+						for (int j = AnimationDB[currentAnimations[i]].startIndex; j <= AnimationDB[currentAnimations[i]].endIndex; j++) {
+							digitalWrite(AnimationDB[currentAnimations[i]].pPinList[j], 255);
+						}
+					}
+					else {
+						for (int j = AnimationDB[currentAnimations[i]].startIndex; j <= AnimationDB[currentAnimations[i]].endIndex; j++) {
+							digitalWrite(AnimationDB[currentAnimations[i]].pPinList[j], 0);
+						}
+					}
+					break;
+				case FORWARD:
+					oldIndex = animationTimers[i].currentIndex++;
+					if (animationTimers[i].currentIndex > (AnimationDB[currentAnimations[i]].endIndex - AnimationDB[currentAnimations[i]].startIndex)) {
+						animationTimers[i].currentIndex = 0; // depending on animType
+					}
+					newIndex = animationTimers[i].currentIndex;
+					break;
+				case BACKWARD:
+					oldIndex = animationTimers[i].currentIndex--;
+					if (animationTimers[i].currentIndex < 0) {
+						animationTimers[i].currentIndex = AnimationDB[currentAnimations[i]].endIndex - AnimationDB[currentAnimations[i]].startIndex; // depending on animType
+					}
+					newIndex = animationTimers[i].currentIndex;
+					break;
+				case FORBACKWARD:
+					animationTimers[i].currentIndex++;
+					if (animationTimers[i].currentIndex >(AnimationDB[currentAnimations[i]].endIndex - AnimationDB[currentAnimations[i]].startIndex)) {
+						oldIndex = 2 * (AnimationDB[currentAnimations[i]].endIndex - AnimationDB[currentAnimations[i]].startIndex) - animationTimers[i].currentIndex + 1;
+						newIndex = 2 * (AnimationDB[currentAnimations[i]].endIndex - AnimationDB[currentAnimations[i]].startIndex) - animationTimers[i].currentIndex ;
+						if (animationTimers[i].currentIndex > 2 * (AnimationDB[currentAnimations[i]].endIndex - AnimationDB[currentAnimations[i]].startIndex)) {
+							animationTimers[i].currentIndex = -1; // depending on animType
+						}
+					}
+					else {
+						oldIndex = animationTimers[i].currentIndex - 1;
+						newIndex = animationTimers[i].currentIndex;
+					}
+					break;
+				case FILLFORWARD:
+					oldIndex = -1;
+					animationTimers[i].currentIndex++;
+					if (animationTimers[i].currentIndex >(AnimationDB[currentAnimations[i]].endIndex - AnimationDB[currentAnimations[i]].startIndex)) {
+						animationTimers[i].currentIndex = 0; // depending on animType
+						for (int j = AnimationDB[currentAnimations[i]].startIndex; j <= AnimationDB[currentAnimations[i]].endIndex; j++) {
+							digitalWrite(AnimationDB[currentAnimations[i]].pPinList[j],0);
+						}
+					}
+					newIndex = animationTimers[i].currentIndex;
+					break;
+				case FILLBACKWARD:
+					oldIndex = -1;
+					animationTimers[i].currentIndex--;
+					if (animationTimers[i].currentIndex < 0) {
+						animationTimers[i].currentIndex = AnimationDB[currentAnimations[i]].endIndex - AnimationDB[currentAnimations[i]].startIndex; // depending on animType
+						for (int j = AnimationDB[currentAnimations[i]].startIndex; j <= AnimationDB[currentAnimations[i]].endIndex; j++) {
+							digitalWrite(AnimationDB[currentAnimations[i]].pPinList[j], 0);
+						}
+					}
+					newIndex = animationTimers[i].currentIndex;
+					break;
+				case FILLFORBACKWARD:
+					//oldIndex =
+						animationTimers[i].currentIndex++;
+					//newIndex = animationTimers[i].currentIndex;
+
+					if (animationTimers[i].currentIndex >(AnimationDB[currentAnimations[i]].endIndex - AnimationDB[currentAnimations[i]].startIndex)) {
+						oldIndex = 2 * (AnimationDB[currentAnimations[i]].endIndex - AnimationDB[currentAnimations[i]].startIndex) - animationTimers[i].currentIndex+1;
+						newIndex = -1;
+						if (animationTimers[i].currentIndex > 2*(AnimationDB[currentAnimations[i]].endIndex - AnimationDB[currentAnimations[i]].startIndex)) {
+							animationTimers[i].currentIndex = -1; // depending on animType
+						}
+					}
+					else {
+						oldIndex = -1;
+						newIndex = animationTimers[i].currentIndex;
+					}
+					break;
+				default:
+					//for testing same as FORWARD
+					Log("Unimplemented Animation Type");
+					/*oldIndex = animationTimers[i].currentIndex++;
+					if (animationTimers[i].currentIndex >(AnimationDB[currentAnimations[i]].endIndex - AnimationDB[currentAnimations[i]].startIndex)) {
+						animationTimers[i].currentIndex = 0; // depending on animType
+					}
+					newIndex = animationTimers[i].currentIndex;*/
+				}
+
+				//do step:
+				if (oldIndex > -1) {
+					digitalWrite(AnimationDB[currentAnimations[i]].pPinList[AnimationDB[currentAnimations[i]].startIndex+oldIndex],0);
+				}
+				if (newIndex > -1) {
+					digitalWrite(AnimationDB[currentAnimations[i]].pPinList[AnimationDB[currentAnimations[i]].startIndex + newIndex], 255);
+				}
+			}
+		}//otherwise skip this anim
+	}
+}
+
 
 void loadDefaultGameSettings() {
 	//Speed Settings
@@ -492,7 +604,8 @@ void loop()
 		}
 		break;
 	case  IDLE:
-		idleAnimations(); // Play Idle Animations
+		//idleAnimations(); // Play Idle Animations
+		newIdleAnimations();
 		if (checkButtons()) {
 			standbyTmr = millis();
 		}
