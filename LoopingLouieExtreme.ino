@@ -438,7 +438,7 @@ void newIdleAnimations() {
 
 void loadDefaultGameSettings() {
 	//Speed Settings
-	gameSettings.randomSpeed = false;
+	gameSettings.randomSpeed = true;
 	gameSettings.startSpeed = NORMAL_MOTOR_SPEED;
 	gameSettings.speedMinDelay = 5000; //0 means: delay between speed steps is always the same
 	gameSettings.speedMaxDelay = 12000;
@@ -447,7 +447,7 @@ void loadDefaultGameSettings() {
 	gameSettings.enableReverse = true;
 
 	//Chef Mode
-	gameSettings.chefMode = true;
+	gameSettings.chefMode = false;
 	gameSettings.chefRoulette = true;     //könnte man zusammenfassen
 	gameSettings.chefChangeDelay = 7000; // indem man chefDelay auf 0 setzt und != 0
 	gameSettings.chefHasShorterCooldown = true;
