@@ -497,6 +497,10 @@ void gameLoop() {
 				state = IDLE;
 				standbyTmr = millis(); // reset standby timer
 				fullOff(); 
+
+				for (int i = 1; i <= 4; i++) {
+					setColor(i, PlayerColor[i - 1]);
+				}
 				return;
 			}
 		}

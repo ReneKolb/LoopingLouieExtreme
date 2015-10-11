@@ -189,7 +189,7 @@ void DoAnimationStep(const AnimationStep leds[], int amount) {
 }
 
 
-void fullOn() {
+void fullOn(boolean includeIR ) {
 	for (int p = 0; p < 4; p++) {
 		for (int l = 0; l < 4; l++) {
 			//digitalWrite(BOOSTER_LEDS[p][l], 255);
@@ -207,7 +207,9 @@ void fullOn() {
 		}
 		digitalWrite(SpecialButtonLED[p], 255);
 	}
-	digitalWrite(PIN_ADDRESS GLOBAL_IR, 255);
+	if (includeIR) {
+		digitalWrite(PIN_ADDRESS GLOBAL_IR, 255);
+	}
 }
 
 void fullOff(boolean includeBoosterLEDs, boolean includeIR) {
@@ -600,7 +602,10 @@ void loop()
 			Log("Wake from Standby Mode");
 			standbyTmr = millis(); //reset StandbyTimer
 			state = IDLE;
-			fullOn();
+			fullOn(false);
+			for (int i = 1; i <= 4; i++) {
+				setColor(i, PlayerColor[i - 1]);
+			}
 		}
 		break;
 	case  IDLE:
