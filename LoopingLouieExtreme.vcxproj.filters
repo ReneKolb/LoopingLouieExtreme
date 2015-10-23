@@ -21,6 +21,7 @@
     <None Include="setupRoutines.ino" />
     <None Include="gameLoops.ino" />
     <None Include="serialInputHandler.ino" />
+    <None Include="AnimationHandler.ino" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="__vm\.LoopingLouieExtreme.vsarduino.h">

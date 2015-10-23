@@ -101,7 +101,7 @@ struct Color {
 #define BLACK							{ 0, 0, 0 }
 const struct Color COLOR[]	=			{ RED, GREEN, BLUE, YELLOW, PURPLE, AQUA, WHITE, BLACK };
 
-const struct Color PlayerColor[4]	=		{ RED,PURPLE, YELLOW,GREEN };
+static const struct Color PlayerColor[4]	=		{ RED,PURPLE, YELLOW,GREEN };
 
 // ********** Define Pins: Special-Button ********** 
 #define PLAYER1_SPECIAL_BUTTON		{0,28}//28
@@ -275,6 +275,7 @@ const PIN_ADDRESS SpeedButton[4][2] = {
 	{ BUTTON_INC_SPEED_PLAYER4 ,BUTTON_DEC_SPEED_PLAYER4 }
 };
 
+/*
 unsigned long idleAnimationTmr[8] = { 0,  0,  0,  0,  0,  0,  0, 0 };
 long idleAnimationStep[8] = { -1, -1, -1, -1, -1, -1, -1, -1 };
 
@@ -607,7 +608,7 @@ const Animation<64, 1> nochntest = { 21,
 	{ { PLAYER4_CIRCLE7,0 } },
 	{ { PLAYER4_CIRCLE8,0 } }
 }
-};
+};*/
 
 enum SpecialItemType {
 	TURBO,
@@ -693,7 +694,7 @@ struct NewAnimation
 	int startIndex;
 	int endIndex;
 	AnimationType animType;
-	int delay;
+	int defaultDelay;
 };
 
 struct AnimationTmr {
@@ -712,10 +713,15 @@ NewAnimation AnimationDB[] = {
 	{ UVLEDs,             0,  15, BLINK,       1500}
 };
 
+struct CurrentAnimationSettings {
+	int animationDBIndex;
+	int delay;
+};
+
 // TODO: COLOR!!!
-
+/*
 AnimationTmr animationTimers[10] = { {0,-1},{ 0,-1 } ,{ 0,-1 } ,{ 0,-1 } ,{ 0,-1 } ,{ 0,-1 } ,{ 0,-1 } ,{ 0,-1 } ,{ 0,-1 } ,{ 0,-1 } }; //max 10 animations at a time
-int currentAnimations[10] = {0, 1, 2, 3, 4 , 5 , 6 ,-1 ,-1 ,-1 }; //indices of the Animation in AnimationDB.
-
+int currentAnimations[10] = {0, 1, 2, 3, 4 , 5 , 6 ,-1 ,-1 ,-1 }; //indices of the Animation corresponding to AnimationDB.
+*/
 
 

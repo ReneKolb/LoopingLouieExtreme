@@ -160,7 +160,7 @@ void inline cmd_enableItems() {
 SpecialItemType itemTypeFromChar(const char c) {
 	if (c == '0') {
 		return TURBO;
-	}else if (c == '"'){
+	}else if (c == '1'){
 		return SLOW;
 	}
 	else {
@@ -318,8 +318,21 @@ void handleSerialInput() {
 			//start the game
 			initGame();
 			break;
+		case 'u':
+			//Serial1.println("Test");
+			break;
+		case 'v':
+			//Serial1.println("AT");
+			break;
 		default:
 			Log("Unkown Action Byte: "+(String)actionByte);
 		}
+	}
+}
+
+
+void handleBTSerialInput() {
+	if (Serial1.available()) {
+		Log("read: "+(String)Serial1.read());
 	}
 }

@@ -20,7 +20,7 @@ GameState gameState;
 boolean enabledPlayer[4];
 uint8_t playerCount;
 
-uint16_t animationDelay;
+//uint16_t animationDelay;
 unsigned long animationTmr;
 uint8_t animationStep;
 
@@ -125,6 +125,7 @@ uint16_t calcAnimationDelay(uint8_t motorSpeed) {
 void initGame() {
 	Log("Init Game");
 	fullOff();
+	setNoAnimation();
 	state = GAME;
 	gameState = COUNTDOWN;
 	gameStartCountdown = millis();
@@ -133,7 +134,7 @@ void initGame() {
 	motorSpeedChangeDelay = 4000 + random(4000);
 	currentMotorSpeed = gameSettings.startSpeed;
 	currentMotorDirection = true;
-	animationDelay = calcAnimationDelay(currentMotorSpeed);
+	//animationDelay = calcAnimationDelay(currentMotorSpeed);
 	animationStep = -1;
 	animationTmr = millis();
 
@@ -243,6 +244,7 @@ void gameLoop() {
 				motorSpeedChangeTmr = millis();
 				eventDelayTmr = millis(); 
 				chefChangeTmr = millis();
+				setAnimation(0, 0,calcAnimationDelay(currentMotorSpeed)); // Circle Animation
 				Log("Countdown done -> start");
 			}
 			else {
@@ -252,6 +254,12 @@ void gameLoop() {
 		}
 		break;
 	case RUNNING:
+		//if(doAnimations)
+		if (eventTmr == 0) {
+			//TODO: Bedingung allgemeiner! aber zum Testen hier speziell
+			handleAnimations();
+		}
+
 		if (turboTmr != 0) {
 			if ((unsigned long)(millis() - turboTmr) > TURBO_DURATION) {
 				turboTmr = 0;
@@ -451,7 +459,8 @@ void gameLoop() {
 					currentMotorSpeed = MAX_MOTOR_SPEED - 50;
 				}
 
-				animationDelay = calcAnimationDelay(currentMotorSpeed);
+				setAnimationDelay(0,calcAnimationDelay(currentMotorSpeed));
+				//animationDelay = calcAnimationDelay(currentMotorSpeed);
 				setMotorSpeed(currentMotorDirection, currentMotorSpeed);
 			}
 		}//end random speed
@@ -469,7 +478,7 @@ void gameLoop() {
 			}
 		}
 
-		if (eventTmr == 0) {
+	/*	if (eventTmr == 0) {
 			//only handle game animation when no event is in progress
 			if ((unsigned long)(millis() - animationTmr) > animationDelay) {
 				animationTmr = millis();
@@ -479,7 +488,7 @@ void gameLoop() {
 				}
 				DoAnimationStep(circleSquenceGame.LEDs[animationStep], circleSquenceGame.maxLED);
 			}
-		}
+		}*/
 		
 		break;
 	case OUTRO:
@@ -501,6 +510,7 @@ void gameLoop() {
 				for (int i = 1; i <= 4; i++) {
 					setColor(i, PlayerColor[i - 1]);
 				}
+				setIdleAnimations();
 				return;
 			}
 		}

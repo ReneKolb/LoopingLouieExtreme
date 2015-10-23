@@ -1,4 +1,5 @@
 #define DEBUG true
+#define BLUETOOTH true
 
 #include <Wire.h>
 #include "Adafruit_MCP23017.h"
@@ -172,23 +173,6 @@ void setColor(const uint8_t player, const Color color) {
 	setColor(player, color.r, color.g, color.b);
 }
 
-void DoAnimationStep(const AnimationStep leds[], int amount) {
-	for (int i = 0; i < amount; i++) {
-		if (leds[i].address.board != NONE.board && leds[i].address.pin != NONE.pin) {
-			if (leds[i].value == 0) {
-				digitalWrite(leds[i].address, 0);
-			}
-			else if (leds[i].value == 255) {
-				digitalWrite(leds[i].address, HIGH);
-			}
-			else {
-				analogWrite(leds[i].address, leds[i].value); //custom analogWrite
-			}
-		}
-	}
-}
-
-
 void fullOn(boolean includeIR ) {
 	for (int p = 0; p < 4; p++) {
 		for (int l = 0; l < 4; l++) {
@@ -243,201 +227,6 @@ void fullOff() {
 	fullOff(true,true);
 }
 
-void idleAnimations() {
-	if ((unsigned long)(millis() - idleAnimationTmr[0]) > idleAnimation1.delay) {
-		idleAnimationTmr[0] = millis();
-		idleAnimationStep[0]++;
-		if (idleAnimationStep[0] >= idleAnimation1.maxStep) {
-			idleAnimationStep[0] = 0;
-		}
-		DoAnimationStep(idleAnimation1.LEDs[idleAnimationStep[0]], idleAnimation1.maxLED);
-	}
-
-	if ((unsigned long)(millis() - idleAnimationTmr[1]) > idleAnimation2.delay) {
-		idleAnimationTmr[1] = millis();
-		idleAnimationStep[1]++;
-		if (idleAnimationStep[1] >= idleAnimation2.maxStep) {
-			idleAnimationStep[1] = 0;
-		}
-		DoAnimationStep(idleAnimation2.LEDs[idleAnimationStep[1]], idleAnimation2.maxLED);
-	}
-
-	if ((unsigned long)(millis() - idleAnimationTmr[2]) > idleAnimation3.delay) {
-		idleAnimationTmr[2] = millis();
-		idleAnimationStep[2]++;
-		if (idleAnimationStep[2] >= idleAnimation3.maxStep) {
-			idleAnimationStep[2] = 0;
-		}
-		DoAnimationStep(idleAnimation3.LEDs[idleAnimationStep[2]], idleAnimation3.maxLED);
-	}
-
-	if ((unsigned long)(millis() - idleAnimationTmr[3]) > idleAnimation4.delay) {
-		idleAnimationTmr[3] = millis();
-		idleAnimationStep[3]++;
-		if (idleAnimationStep[3] >= idleAnimation4.maxStep) {
-			idleAnimationStep[3] = 0;
-		}
-		DoAnimationStep(idleAnimation4.LEDs[idleAnimationStep[3]], idleAnimation4.maxLED);
-	}
-
-	if ((unsigned long)(millis() - idleAnimationTmr[4]) > idleAnimation5.delay) {
-		idleAnimationTmr[4] = millis();
-		idleAnimationStep[4]++;
-		if (idleAnimationStep[4] >= idleAnimation5.maxStep) {
-			idleAnimationStep[4] = 0;
-		}
-		DoAnimationStep(idleAnimation5.LEDs[idleAnimationStep[4]], idleAnimation5.maxLED);
-	}
-
-	if ((unsigned long)(millis() - idleAnimationTmr[5]) > idleAnimation6.delay) {
-		idleAnimationTmr[5] = millis();
-		idleAnimationStep[5]++;
-		if (idleAnimationStep[5] >= idleAnimation6.maxStep) {
-			idleAnimationStep[5] = 0;
-		}
-		DoAnimationStep(idleAnimation6.LEDs[idleAnimationStep[5]], idleAnimation6.maxLED);
-	}
-
-	if ((unsigned long)(millis() - idleAnimationTmr[6]) > middleSquence.delay) {
-		idleAnimationTmr[6] = millis();
-		idleAnimationStep[6]++;
-		if (idleAnimationStep[6] >= middleSquence.maxStep) {
-			idleAnimationStep[6] = 0;
-		}
-		DoAnimationStep(middleSquence.LEDs[idleAnimationStep[6]], middleSquence.maxLED);
-	}
-
-	if ((unsigned long)(millis() - idleAnimationTmr[7]) > circleSquence.delay) {
-		idleAnimationTmr[7] = millis();
-		idleAnimationStep[7]++;
-		if (idleAnimationStep[7] >= circleSquence.maxStep) {
-			idleAnimationStep[7] = 0;
-		}
-		DoAnimationStep(circleSquence.LEDs[idleAnimationStep[7]], circleSquence.maxLED);
-	}
-
-	/*if ((unsigned long)(millis() - idleAnimationTmr[7]) > nochntest.delay) {
-		idleAnimationTmr[7] = millis();
-		idleAnimationStep[7]++;
-		if (idleAnimationStep[7] >= nochntest.maxStep) {
-			idleAnimationStep[7] = 0;
-		}
-		DoAnimationStep(nochntest.LEDs[idleAnimationStep[7]], nochntest.maxLED);
-	}*/
-}
-void newIdleAnimations() {
-	int oldIndex; //rename to offIndex
-	int newIndex; //rename to onIndex
-	for (int i = 0; i < 10;i++) {
-		if (currentAnimations[i] != -1) {
-			if ((unsigned long)(millis() - animationTimers[i].tmr)>AnimationDB[currentAnimations[i]].delay) {
-				animationTimers[i].tmr = millis();
-				switch (AnimationDB[currentAnimations[i]].animType) {
-				case BLINK:
-					oldIndex = -1;
-					newIndex = -1;
-					if (++animationTimers[i].currentIndex >= 1) {
-						animationTimers[i].currentIndex = -1;
-						for (int j = AnimationDB[currentAnimations[i]].startIndex; j <= AnimationDB[currentAnimations[i]].endIndex; j++) {
-							digitalWrite(AnimationDB[currentAnimations[i]].pPinList[j], 255);
-						}
-					}
-					else {
-						for (int j = AnimationDB[currentAnimations[i]].startIndex; j <= AnimationDB[currentAnimations[i]].endIndex; j++) {
-							digitalWrite(AnimationDB[currentAnimations[i]].pPinList[j], 0);
-						}
-					}
-					break;
-				case FORWARD:
-					oldIndex = animationTimers[i].currentIndex++;
-					if (animationTimers[i].currentIndex > (AnimationDB[currentAnimations[i]].endIndex - AnimationDB[currentAnimations[i]].startIndex)) {
-						animationTimers[i].currentIndex = 0; // depending on animType
-					}
-					newIndex = animationTimers[i].currentIndex;
-					break;
-				case BACKWARD:
-					oldIndex = animationTimers[i].currentIndex--;
-					if (animationTimers[i].currentIndex < 0) {
-						animationTimers[i].currentIndex = AnimationDB[currentAnimations[i]].endIndex - AnimationDB[currentAnimations[i]].startIndex; // depending on animType
-					}
-					newIndex = animationTimers[i].currentIndex;
-					break;
-				case FORBACKWARD:
-					animationTimers[i].currentIndex++;
-					if (animationTimers[i].currentIndex >(AnimationDB[currentAnimations[i]].endIndex - AnimationDB[currentAnimations[i]].startIndex)) {
-						oldIndex = 2 * (AnimationDB[currentAnimations[i]].endIndex - AnimationDB[currentAnimations[i]].startIndex) - animationTimers[i].currentIndex + 1;
-						newIndex = 2 * (AnimationDB[currentAnimations[i]].endIndex - AnimationDB[currentAnimations[i]].startIndex) - animationTimers[i].currentIndex ;
-						if (animationTimers[i].currentIndex > 2 * (AnimationDB[currentAnimations[i]].endIndex - AnimationDB[currentAnimations[i]].startIndex)) {
-							animationTimers[i].currentIndex = -1; // depending on animType
-						}
-					}
-					else {
-						oldIndex = animationTimers[i].currentIndex - 1;
-						newIndex = animationTimers[i].currentIndex;
-					}
-					break;
-				case FILLFORWARD:
-					oldIndex = -1;
-					animationTimers[i].currentIndex++;
-					if (animationTimers[i].currentIndex >(AnimationDB[currentAnimations[i]].endIndex - AnimationDB[currentAnimations[i]].startIndex)) {
-						animationTimers[i].currentIndex = 0; // depending on animType
-						for (int j = AnimationDB[currentAnimations[i]].startIndex; j <= AnimationDB[currentAnimations[i]].endIndex; j++) {
-							digitalWrite(AnimationDB[currentAnimations[i]].pPinList[j],0);
-						}
-					}
-					newIndex = animationTimers[i].currentIndex;
-					break;
-				case FILLBACKWARD:
-					oldIndex = -1;
-					animationTimers[i].currentIndex--;
-					if (animationTimers[i].currentIndex < 0) {
-						animationTimers[i].currentIndex = AnimationDB[currentAnimations[i]].endIndex - AnimationDB[currentAnimations[i]].startIndex; // depending on animType
-						for (int j = AnimationDB[currentAnimations[i]].startIndex; j <= AnimationDB[currentAnimations[i]].endIndex; j++) {
-							digitalWrite(AnimationDB[currentAnimations[i]].pPinList[j], 0);
-						}
-					}
-					newIndex = animationTimers[i].currentIndex;
-					break;
-				case FILLFORBACKWARD:
-					//oldIndex =
-						animationTimers[i].currentIndex++;
-					//newIndex = animationTimers[i].currentIndex;
-
-					if (animationTimers[i].currentIndex >(AnimationDB[currentAnimations[i]].endIndex - AnimationDB[currentAnimations[i]].startIndex)) {
-						oldIndex = 2 * (AnimationDB[currentAnimations[i]].endIndex - AnimationDB[currentAnimations[i]].startIndex) - animationTimers[i].currentIndex+1;
-						newIndex = -1;
-						if (animationTimers[i].currentIndex > 2*(AnimationDB[currentAnimations[i]].endIndex - AnimationDB[currentAnimations[i]].startIndex)) {
-							animationTimers[i].currentIndex = -1; // depending on animType
-						}
-					}
-					else {
-						oldIndex = -1;
-						newIndex = animationTimers[i].currentIndex;
-					}
-					break;
-				default:
-					//for testing same as FORWARD
-					Log("Unimplemented Animation Type");
-					/*oldIndex = animationTimers[i].currentIndex++;
-					if (animationTimers[i].currentIndex >(AnimationDB[currentAnimations[i]].endIndex - AnimationDB[currentAnimations[i]].startIndex)) {
-						animationTimers[i].currentIndex = 0; // depending on animType
-					}
-					newIndex = animationTimers[i].currentIndex;*/
-				}
-
-				//do step:
-				if (oldIndex > -1) {
-					digitalWrite(AnimationDB[currentAnimations[i]].pPinList[AnimationDB[currentAnimations[i]].startIndex+oldIndex],0);
-				}
-				if (newIndex > -1) {
-					digitalWrite(AnimationDB[currentAnimations[i]].pPinList[AnimationDB[currentAnimations[i]].startIndex + newIndex], 255);
-				}
-			}
-		}//otherwise skip this anim
-	}
-}
-
-
 void loadDefaultGameSettings() {
 	//Speed Settings
 	gameSettings.randomSpeed = true;
@@ -479,6 +268,7 @@ void setup()
 	//init bluetooth
 	//if (BLUETOOTH) {
 //		Log("init bluetooth");
+		//pinMode(19, INPUT_PULLUP);
 		//Serial1.begin(9600); //TX1 & RX1 pins
 	//}
 
@@ -517,8 +307,11 @@ void setup()
 	randomSeed(analogRead(1)*micros());
 
 	loadDefaultGameSettings();
+	setIdleAnimations();
 
 	Log("setup done.");
+
+	//Serial1.println("BT: ready");
 
 	//fullOn();
 //	digitalWrite(PIN_ADDRESS GLOBAL_IR, LOW);
@@ -610,7 +403,8 @@ void loop()
 		break;
 	case  IDLE:
 		//idleAnimations(); // Play Idle Animations
-		newIdleAnimations();
+		//newIdleAnimations();
+		handleAnimations();
 		if (checkButtons()) {
 			standbyTmr = millis();
 		}
@@ -649,6 +443,10 @@ void loop()
 	
 	if (DEBUG) {
 		handleSerialInput();
+	}
+
+	if (BLUETOOTH) {
+		handleBTSerialInput();
 	}
 
 /*	unsigned long cycleTime = (millis() - startTime);
