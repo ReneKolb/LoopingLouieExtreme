@@ -311,7 +311,7 @@ void setup()
 
 	Log("setup done.");
 
-	Serial1.println("BT: ready");
+	//Serial1.println("BT: ready");
 
 	//fullOn();
 //	digitalWrite(PIN_ADDRESS GLOBAL_IR, LOW);

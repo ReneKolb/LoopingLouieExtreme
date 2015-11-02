@@ -18,10 +18,10 @@ void inline cmd_randomSpeed() {
 void inline cmd_startSpeed() {
 	int n = atoi(buffer);
 	if (n < MIN_MOTOR_SPEED) {
-		Log("start Speed is smaller than "+(String)MIN_MOTOR_SPEED+". It is fitted!");
+		Log("start Speed "+(String)n+" is smaller than "+(String)MIN_MOTOR_SPEED+". It is fitted!");
 		n = MIN_MOTOR_SPEED;
 	} else if (n>MAX_MOTOR_SPEED) {
-		Log("start Speed is larger than "+(String)MAX_MOTOR_SPEED+". It is fitted!");
+		Log("start Speed "+(String)n+" is larger than "+(String)MAX_MOTOR_SPEED+". It is fitted!");
 		n = MAX_MOTOR_SPEED;
 	}
 	gameSettings.startSpeed = n;
@@ -31,11 +31,11 @@ void inline cmd_startSpeed() {
 void inline cmd_speedMinDelay() {
 	int n = atoi(buffer);
 	if (n < 0) {
-		Log("Speed Min Delay is smaller than 0. It is fitted!");
+		Log("Speed Min Delay " + (String)n + " is smaller than 0. It is fitted!");
 		n = 0;
 	}
 	else if (n>60000) {
-		Log("Speed Min Delay is larger than 60000. It is fitted!");
+		Log("Speed Min Delay " + (String)n + " is larger than 60000. It is fitted!");
 		n = 60000;
 	}
 	gameSettings.speedMinDelay = n;
@@ -45,15 +45,15 @@ void inline cmd_speedMinDelay() {
 void inline cmd_speedMaxDelay() {
 	int n = atoi(buffer);
 	if (n < 0) {
-		Log("Speed Max Delay is smaller than 0. It is fitted!");
+		Log("Speed Max Delay " + (String)n + " is smaller than 0. It is fitted!");
 		n = 0;
 	}
 	else if (n>60000) {
-		Log("Speed Max Delay is larger than 60000. It is fitted!");
+		Log("Speed Max Delay " + (String)n + " is larger than 60000. It is fitted!");
 		n = 60000;
 	}
 	if (n < gameSettings.speedMinDelay) {
-		Log("Speed Max Delay is smaller than Speed Min Delay("+(String)gameSettings.speedMinDelay+"). It is fitted!");
+		Log("Speed Max Delay " + (String)n + " is smaller than Speed Min Delay("+(String)gameSettings.speedMinDelay+"). It is fitted!");
 		n = gameSettings.speedMinDelay;
 	}
 	gameSettings.speedMaxDelay = n;
@@ -63,11 +63,11 @@ void inline cmd_speedMaxDelay() {
 void inline cmd_speedMinStepSize() {
 	int n = atoi(buffer);
 	if (n < 0) {
-		Log("Speed Min Step Size is smaller than 0. It is fitted!");
+		Log("Speed Min Step Size " + (String)n + " is smaller than 0. It is fitted!");
 		n = 0;
 	}
 	else if (n>170) {
-		Log("Speed Min Step Size is larger than 170. It is fitted!");
+		Log("Speed Min Step Size " + (String)n + " is larger than 170. It is fitted!");
 		n = 170;
 	}
 	gameSettings.speedMinStepSize = n;
@@ -77,15 +77,15 @@ void inline cmd_speedMinStepSize() {
 void inline cmd_speedMaxStepSize() {
 	int n = atoi(buffer);
 	if (n < 0) {
-		Log("Speed Max Step Size is smaller than 0. It is fitted!");
+		Log("Speed Max Step Size " + (String)n + " is smaller than 0. It is fitted!");
 		n = 0;
 	}
 	else if (n>170) {
-		Log("Speed Max Step Size is larger than 170. It is fitted!");
+		Log("Speed Max Step Size " + (String)n + " is larger than 170. It is fitted!");
 		n = 170;
 	}
 	if (n < gameSettings.speedMinStepSize) {
-		Log("Speed Max Step Size is smaller than Speed Min Step Size(" + (String)gameSettings.speedMinStepSize + "). It is fitted!");
+		Log("Speed Max Step Size " + (String)n + " is smaller than Speed Min Step Size(" + (String)gameSettings.speedMinStepSize + "). It is fitted!");
 		n = gameSettings.speedMinStepSize;
 	}
 	gameSettings.speedMaxStepSize = n;
@@ -125,11 +125,11 @@ void inline cmd_chefRoulette() {
 void inline cmd_chefChangeDelay() {
 	int n = atoi(buffer);
 	if (n < 0) {
-		Log("Chef Change Delay is smaller than 0. It is fitted!");
+		Log("Chef Change Delay " + (String)n + " is smaller than 0. It is fitted!");
 		n = 0;
 	}
 	else if (n>60000) {
-		Log("Chef Change Delay is larger than 60000. It is fitted!");
+		Log("Chef Change Delay " + (String)n + " is larger than 60000. It is fitted!");
 		n = 60000;
 	}
 	
@@ -193,11 +193,11 @@ void inline cmd_enableEvents() {
 void inline cmd_itemAutoRefillDelay() {
 	int n = atoi(buffer);
 	if (n < 0) {
-		Log("Item Auto Refill Delay is smaller than 0. It is fitted!");
+		Log("Item Auto Refill Delay " + (String)n + " is smaller than 0. It is fitted!");
 		n = 0;
 	}
 	else if (n>60000) {
-		Log("Item Auto Refill Delay is larger than 60000. It is fitted!");
+		Log("Item Auto Refill Delay " + (String)n + " is larger than 60000. It is fitted!");
 		n = 60000;
 	}
 
@@ -208,11 +208,11 @@ void inline cmd_itemAutoRefillDelay() {
 void inline cmd_itemCDDelay() {
 	int n = atoi(buffer);
 	if (n < 0) {
-		Log("Item CD Delay is smaller than 0. It is fitted!");
+		Log("Item CD Delay " + (String)n + " is smaller than 0. It is fitted!");
 		n = 0;
 	}
 	else if (n>60000) {
-		Log("Item CD Delay is larger than 60000. It is fitted!");
+		Log("Item CD Delay " + (String)n + " is larger than 60000. It is fitted!");
 		n = 60000;
 	}
 
@@ -232,11 +232,14 @@ void inline cmd_alternateCD() {
 }
 
 void fillBuffer(boolean usb) {
+	//first clear old buffer
+	memset(buffer, 0, sizeof(buffer));
 	if (usb) {
 		readSize = Serial.readBytesUntil('.', buffer, 6);
 	}
 	else {
 		readSize = Serial1.readBytesUntil('.', buffer, 6);
+		Log("read"+(String)buffer);
 	}
 }
 

@@ -245,6 +245,20 @@ void initGame() {
 		//display chef
 		Log("new Chef: " + (String)(currentChefIndex + 1));
 	}
+
+	Log("Game Settings:");
+	Log("Start  Speed:  " + (String)gameSettings.startSpeed);
+	Log("Random Speed:  " + (String)gameSettings.randomSpeed);
+	Log("Min Speed Del: " + (String)gameSettings.speedMinDelay);
+	Log("Max Speed Del: " + (String)gameSettings.speedMaxDelay);
+	Log("Min Speed Ste: " + (String)gameSettings.speedMinStepSize);
+	Log("Max Speed Ste: " + (String)gameSettings.speedMaxStepSize);
+	Log("Enable Revers: " + (String)gameSettings.enableReverse);
+	Log("Chef Mode:     " + (String)gameSettings.chefMode);
+	Log("Chef Roulette: " + (String)gameSettings.chefRoulette);
+	Log("Chef Delay:    " + (String)gameSettings.chefChangeDelay);
+	Log("Chef Cooldown: " + (String)gameSettings.chefHasShorterCooldown);
+	Log("Enable Items:  " + (String)gameSettings.enableItems);
 }
 
 void gameLoop() {
