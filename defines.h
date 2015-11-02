@@ -613,7 +613,8 @@ const Animation<64, 1> nochntest = { 21,
 enum SpecialItemType {
 	TURBO,
 	SLOW,
-	CHANGE_DIR
+	CHANGE_DIR,
+	BLACKOUT
 };
 
 struct GameSettings{
@@ -681,9 +682,29 @@ boolean currentDirection // true=foreward; false=backward
 };
 */
 
+static const PIN_ADDRESS UVLEDs_OUTER[8] = {
+	PLAYER1_UV1, PLAYER1_UV2,
+	PLAYER2_UV1, PLAYER2_UV2,
+	PLAYER3_UV1, PLAYER3_UV2,
+	PLAYER4_UV1, PLAYER4_UV2
+};
+
+static const PIN_ADDRESS UVLEDs_INNER[8] = {
+	PLAYER1_UV3, PLAYER1_UV4,
+	PLAYER2_UV3, PLAYER2_UV4,
+	PLAYER3_UV3, PLAYER3_UV4,
+	PLAYER4_UV3, PLAYER4_UV4
+};
+
+static const Color COLOR_LIST[4] = {
+	RED, PURPLE, YELLOW, GREEN
+};
+
 enum AnimationType
 {
-	BLINK, FORWARD, BACKWARD, FORBACKWARD, FILLFORWARD, FILLBACKWARD, FILLFORBACKWARD
+	BLINK, FORWARD, BACKWARD, FORBACKWARD, FILLFORWARD, FILLBACKWARD, FILLFORBACKWARD,
+
+	COLOR_FORWARD
 };
 
 
@@ -691,10 +712,14 @@ enum AnimationType
 struct NewAnimation
 {
 	const PIN_ADDRESS *pPinList;
+	const Color *pColorList;
 	int startIndex;
 	int endIndex;
 	AnimationType animType;
 	int defaultDelay;
+
+	NewAnimation(const PIN_ADDRESS *pPinLst, int startIdx, int endIdx, AnimationType animTyp,int defaultDel) : pPinList(pPinLst),startIndex(startIdx),endIndex(endIdx),animType(animTyp),defaultDelay(defaultDel){}
+	NewAnimation(const Color *pColorLst, int startIdx, int endIdx, AnimationType animTyp, int defaultDel) : pColorList(pColorLst), startIndex(startIdx), endIndex(endIdx), animType(animTyp), defaultDelay(defaultDel) {}
 };
 
 struct AnimationTmr {
@@ -703,14 +728,17 @@ struct AnimationTmr {
 };
 
 NewAnimation AnimationDB[] = {
-	{ playerCircle,       0,  31, BACKWARD,     20 },
-	{ playerMiddleColors, 0,  19, FORWARD,     32 },
+	{ playerCircle,       0,  31, BACKWARD,      23 },
+	{ playerMiddleColors, 0,  19, FORWARD,       32 },
 	//Booster Display Animation
-	{ BOOSTER_LEDS,       0,  3,  FILLFORWARD, 100 },
-	{ BOOSTER_LEDS,       4,  7,  FILLBACKWARD, 100 },
+	{ BOOSTER_LEDS,       0,  3,  FILLFORWARD,   100 },
+	{ BOOSTER_LEDS,       4,  7,  FILLBACKWARD,   100 },
 	{ BOOSTER_LEDS,       8,  11, FILLFORBACKWARD, 100 },
-	{ BOOSTER_LEDS,       12, 15, FORBACKWARD, 100 },
-	{ UVLEDs,             0,  15, BLINK,       1500}
+	{ BOOSTER_LEDS,       12, 15, FORBACKWARD,   100 },
+	{ UVLEDs,             0,  15, BLINK,         1500},
+	{ UVLEDs_OUTER,       0,  7,  BLINK,         1500},
+	{ UVLEDs_INNER,       0,  7,  BLINK,         640},
+	{ COLOR_LIST,         0,  3,  COLOR_FORWARD, 160}
 };
 
 struct CurrentAnimationSettings {

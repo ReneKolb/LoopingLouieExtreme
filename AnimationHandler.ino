@@ -12,9 +12,9 @@ void setIdleAnimations() {
 	currentAnimations[3] = { 3,-1 };
 	currentAnimations[4] = { 4,-1 };
 	currentAnimations[5] = { 5,-1 };
-	currentAnimations[6] = { 6,-1 };
-	currentAnimations[7] = { -1,-1 };
-	currentAnimations[8] = { -1,-1 };
+	currentAnimations[6] = { 7,-1 };
+	currentAnimations[7] = { 8,-1 };
+	currentAnimations[8] = { 9,-1 };
 	currentAnimations[9] = { -1,-1 };
 }
 
@@ -41,8 +41,14 @@ void setAnimationDelay(int animationSlot, int overrideDelay) {
 
 
 void handleAnimationStep(NewAnimation &anim, AnimationTmr &animTmr) {
+	bool colorMode = false;
 	int oldIndex;
 	int newIndex;
+
+	int oldPlayerIndex;
+	int newPlayerIndex;
+	Color newOldColor;
+	Color newNewColor;
 
 	switch (anim.animType) {
 	case BLINK:
@@ -127,16 +133,41 @@ void handleAnimationStep(NewAnimation &anim, AnimationTmr &animTmr) {
 			newIndex = animTmr.currentIndex;
 		}
 		break;
+	case COLOR_FORWARD:
+		colorMode = true;
+
+		oldPlayerIndex = oldIndex = animTmr.currentIndex++;
+		
+		if (animTmr.currentIndex > (anim.endIndex - anim.startIndex)) {
+			animTmr.currentIndex = 0; // depending on animType
+		}
+		newPlayerIndex =  newIndex = animTmr.currentIndex;
+
+		newOldColor = BLACK;
+		newNewColor = anim.pColorList[anim.startIndex + newIndex];
+
+		break;
 	default:
 		Log("Unimplemented Animation Type");
 	}
 
-	//do step:
-	if (oldIndex > -1) {
-		digitalWrite(anim.pPinList[anim.startIndex + oldIndex], 0);
+	if (colorMode) {
+		//old- & newIndex means playerIndex
+		if (oldIndex > -1) {
+			setColor(oldPlayerIndex+1,newOldColor);
+		}
+		if (newIndex > -1) {
+			setColor(newPlayerIndex+1,newNewColor);
+		}
 	}
-	if (newIndex > -1) {
-		digitalWrite(anim.pPinList[anim.startIndex + newIndex], 255);
+	else {
+		//do step:
+		if (oldIndex > -1) {
+			digitalWrite(anim.pPinList[anim.startIndex + oldIndex], 0);
+		}
+		if (newIndex > -1) {
+			digitalWrite(anim.pPinList[anim.startIndex + newIndex], 255);
+		}
 	}
 }
 

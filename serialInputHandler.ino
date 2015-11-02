@@ -231,85 +231,101 @@ void inline cmd_alternateCD() {
 
 }
 
-void fillBuffer() {
-	readSize = Serial.readBytesUntil('.', buffer, 6);
+void fillBuffer(boolean usb) {
+	if (usb) {
+		readSize = Serial.readBytesUntil('.', buffer, 6);
+	}
+	else {
+		readSize = Serial1.readBytesUntil('.', buffer, 6);
+	}
 }
 
 //DEBUG
 int pIndex = 0;
 int lIndex = -1;
 
+boolean usbAvailable;
+boolean btAvailable;
+
 void handleSerialInput() {
-	if (Serial.available()) {
+	usbAvailable = Serial.available();
+	btAvailable = Serial1.available();
+	if (usbAvailable||btAvailable) {
 		//first char is action type
-		actionByte = Serial.read();
+		if (usbAvailable) {
+			actionByte = Serial.read();
+		}
+		else {
+			actionByte = Serial1.read();
+		}
+
 		switch (actionByte) {
 		case 'a':
-			fillBuffer();
+			fillBuffer(usbAvailable);
 			cmd_randomSpeed();
 			break;
 		case 'b':
-			fillBuffer();
+			fillBuffer(usbAvailable);
 			cmd_startSpeed();
 			break;
 		case 'c':
-			fillBuffer();
+			fillBuffer(usbAvailable);
 			cmd_speedMinDelay();
 			break;
 		case 'd':
-			fillBuffer();
+			fillBuffer(usbAvailable);
 			cmd_speedMaxDelay();
 			break;
 		case 'e':
-			fillBuffer();
+			fillBuffer(usbAvailable);
 			cmd_speedMinStepSize();
 			break;
 		case 'f':
-			fillBuffer();
+			fillBuffer(usbAvailable);
 			cmd_speedMaxStepSize();
 			break;
 		case 'g':
-			fillBuffer();
+			fillBuffer(usbAvailable);
 			cmd_enableReverse();
 			break;
 		case 'h':
-			fillBuffer();
+			fillBuffer(usbAvailable);
 			cmd_chefMode();
 			break;
 		case 'i':
-			fillBuffer();
+			fillBuffer(usbAvailable);
 			cmd_chefRoulette();
 			break;
 		case 'j':
-			fillBuffer();
+			fillBuffer(usbAvailable);
 			cmd_chefChangeDelay();
 			break;
 		case 'k':
-			fillBuffer();
+			fillBuffer(usbAvailable);
 			cmd_chefShorterCD();
 			break;
 		case 'l':
-			fillBuffer();
+			fillBuffer(usbAvailable);
 			cmd_enableItems();
 			break;
 		case 'm':
-			fillBuffer();
+			fillBuffer(usbAvailable);
 			cmd_itemTypes();
 			break;
 		case 'n':
-			fillBuffer();
+			fillBuffer(usbAvailable);
 			cmd_enableEvents();
 			break;
 		case 'o':
-			fillBuffer();
+			fillBuffer(usbAvailable);
 			cmd_itemAutoRefillDelay();
 			break;
 		case 'p':
-			fillBuffer();
+			fillBuffer(usbAvailable);
 			cmd_itemCDDelay();
 			break;
 		case 'q':
-			fillBuffer();
+			fillBuffer(usbAvailable);
 			cmd_alternateCD();
 			break;
 		/*case 'r':
@@ -318,11 +334,8 @@ void handleSerialInput() {
 			//start the game
 			initGame();
 			break;
-		case 'u':
-			//Serial1.println("Test");
-			break;
-		case 'v':
-			//Serial1.println("AT");
+		case '.':
+			//'.' is the command end symbol. So a actionByte with '.' is no command. --> Ignore
 			break;
 		default:
 			Log("Unkown Action Byte: "+(String)actionByte);
@@ -332,7 +345,7 @@ void handleSerialInput() {
 
 
 void handleBTSerialInput() {
-	if (Serial1.available()) {
-		Log("read: "+(String)Serial1.read());
-	}
+	//if (Serial1.available()) {
+//		Log("read: "+ Serial1.readString());
+//	}
 }

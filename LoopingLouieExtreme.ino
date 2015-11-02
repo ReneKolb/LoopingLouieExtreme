@@ -266,11 +266,11 @@ void setup()
 	Log("setup");
 
 	//init bluetooth
-	//if (BLUETOOTH) {
-//		Log("init bluetooth");
+	if (BLUETOOTH) {
+		Log("init bluetooth");
 		//pinMode(19, INPUT_PULLUP);
-		//Serial1.begin(9600); //TX1 & RX1 pins
-	//}
+		Serial1.begin(9600); //TX1 & RX1 pins
+	}
 
 	// ********** Motor pins Setup **********
 	setupMotor();
@@ -311,7 +311,7 @@ void setup()
 
 	Log("setup done.");
 
-	//Serial1.println("BT: ready");
+	Serial1.println("BT: ready");
 
 	//fullOn();
 //	digitalWrite(PIN_ADDRESS GLOBAL_IR, LOW);
@@ -446,7 +446,7 @@ void loop()
 	}
 
 	if (BLUETOOTH) {
-		handleBTSerialInput();
+		//handleBTSerialInput();
 	}
 
 /*	unsigned long cycleTime = (millis() - startTime);

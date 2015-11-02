@@ -48,7 +48,10 @@ boolean currentMotorDirection; //true = forward
 unsigned long motorSpeedChangeTmr;
 uint16_t motorSpeedChangeDelay;
 
-uint8_t winner;
+//uint8_t loser;
+//uint8_t winner;
+uint8_t score[4]; // 0 -> 1st (winner player), 1 -> 2nd, 2 -> 3rd player, 3 -> 4th player (loser)
+uint8_t currentScore;
 
 void enablePlayer(uint8_t player) {
 	setColor(player, PlayerColor[player - 1]);
@@ -159,6 +162,12 @@ void initGame() {
 	playerSpecialItemAmount[2] = 4;
 	playerSpecialItemAmount[3] = 4;
 
+	score[0] = 255;
+	score[1] = 255;
+	score[2] = 255;
+	score[3] = 255;
+	currentScore = 0;
+
 	/*playerSpecialItemType[0] = TURBO;
 	playerSpecialItemType[1] = SLOW;
 	playerSpecialItemType[2] = TURBO;
@@ -171,7 +180,8 @@ void initGame() {
 	eventDelay = 5000 + random(5000);
 	eventTmr = 0;
 
-	winner = 255;
+	//loser = 255;
+	//winner = 255;
 
 	digitalWrite(PIN_ADDRESS GLOBAL_IR, HIGH);
 
@@ -216,9 +226,14 @@ void initGame() {
 
 	if (playerCount <= 1) {
 		Log("Cannot start. Too few Players available (" +(String)playerCount+")");
+		Serial1.print("b"+(String)playerCount+".");
 		state = IDLE;
+		setIdleAnimations();
 		return;
 		//gameState = COUNTDOWN;
+	}
+	else {
+		Serial1.print("c.");
 	}
 
 	if (gameSettings.chefMode) {
@@ -292,6 +307,12 @@ void gameLoop() {
 							//Log("player " + (String)(i + 1) + ": "+(String) cnt+" chips left");
 							if (cnt == 0) {
 								enabledPlayer[i] = false;
+								score[currentScore] = i;
+								Log("Player OUT: "+(String)i+" platz: "+(String)currentScore);
+								currentScore++;
+								//if (loser == 255) {
+//									loser = i;
+								//}
 								//TEST: disable Player LEDs
 								for (int l = 0; l < 5; l++) {
 									digitalWrite(playerMiddleColors[getPinIndex(i,l, MAX_LEDS_MIDDLE)],0);
@@ -304,7 +325,8 @@ void gameLoop() {
 									//Only 1 player left -> game is finished!
 									for (int i = 0; i < 4;i++) {
 										if (enabledPlayer[i]) {
-											winner = i + 1;
+											score[currentScore] = i;
+											//winner = i + 1;
 											break;
 										}
 									}
@@ -499,7 +521,7 @@ void gameLoop() {
 
 			//setColor(winner, (countdownAnimation%2==0)?(Color BLACK):(PlayerColor[winner-1]));
 			for (int i = 1; i <= 4; i++) {
-				setColor(i, (countdownAnimation % 2 == 0) ? (Color BLACK) : (PlayerColor[winner - 1]));
+				setColor(i, (countdownAnimation % 2 == 0) ? (Color BLACK) : (PlayerColor[score[currentScore]]));
 			}
 
 			if (countdownAnimation > 21) {
@@ -528,4 +550,5 @@ void endGame() {
 	//play end/win effect
 	digitalWrite(PIN_ADDRESS GLOBAL_IR, LOW);
 	setMotorSpeed(true,0);
+	Serial1.print("a"+(String)score[3]+":" + (String)score[2] + ":" + (String)score[1] + ":" + (String)score[0] +".");
 }
