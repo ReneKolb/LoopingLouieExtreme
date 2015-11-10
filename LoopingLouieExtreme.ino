@@ -30,6 +30,11 @@ void Log(String msg) {
 }
 
 void digitalWrite(const PIN_ADDRESS pinAddress, const uint8_t value) {
+	if (pinAddress.pin >= 54 && pinAddress.pin <= 69) {
+		Log("Trying to write analog-Input pin");
+		return;
+	}
+
 	switch (pinAddress.board) {
 	case 0:
 		digitalWrite(pinAddress.pin, value);
@@ -146,7 +151,7 @@ void updatePlayerBoosterLEDs(const uint8_t player, const uint8_t amount) {
 }
 
 boolean playerChip(uint8_t player, uint8_t chip) {
-	return analogRead(PlayerIRPins[player-1][chip-1].pin-100) < IR_THRESHOLD;
+	return analogRead(PlayerIRPins[player - 1][chip - 1].pin - 100) < IR_THRESHOLD;
 }
 
 uint8_t getPlayerChipAmount(uint8_t player) {
@@ -268,7 +273,6 @@ void setup()
 	//init bluetooth
 	if (BLUETOOTH) {
 		Log("init bluetooth");
-		//pinMode(19, INPUT_PULLUP);
 		Serial1.begin(9600); //TX1 & RX1 pins
 	}
 
@@ -310,77 +314,7 @@ void setup()
 	setIdleAnimations();
 
 	Log("setup done.");
-
-	//Serial1.println("BT: ready");
-
-	//fullOn();
-//	digitalWrite(PIN_ADDRESS GLOBAL_IR, LOW);
 }
-
-/*
-int received;
-long received_LONG;
-int data;
-
-void handleSerialInput() {
-	//Handle DEBUG Serial Commands
-	if (Serial.available()) {
-		//first char is action type
-		data = Serial.read();
-
-		Log("Received Action-Byte: " + (String)data);
-		//Rest is Data
-		if (data == 'm') {
-			//MANUAL MOTOR CONTROL
-			received_LONG = Serial.parseInt(); //only for testing (delay reduced by setTimeout() )
-			if (received_LONG > 170) {
-				received_LONG = 170;
-			}
-			else if (received_LONG < -170) {
-				received_LONG = -170;
-			}
-
-			if (received_LONG > 0) {
-				setMotorSpeed(true, received_LONG);
-			}
-			else {
-				setMotorSpeed(false, -received_LONG);
-			}
-		}
-		else if (data == 'p') {
-			int value;
-			value = Serial.parseInt();
-			Log("Value: " + (String)value);
-			digitalWrite(PIN_ADDRESS{ 2,value }, HIGH);
-		}
-		else if (data == 's') {
-			initGame();
-		}
-		else if (data == 'i') {
-			digitalWrite(PIN_ADDRESS GLOBAL_IR, HIGH);
-			Log("Global IR on");
-		}
-		else if (data == 'o') {
-			digitalWrite(PIN_ADDRESS GLOBAL_IR, LOW);
-			Log("Global IR off");
-		}
-		else if (data == 'r') {
-			Log("IR status:");
-			Log(" 4 \t| 1 \t| 2 \t| 3");
-			Log("0: " + (String)(analogRead(0)) + "\t|3: " + (String)(analogRead(3)) + "\t|6: " + (String)(analogRead(6)) + "\t|9: " + (String)(analogRead(9)));
-			Log("1: " + (String)(analogRead(1)) + "\t|4: " + (String)(analogRead(4)) + "\t|7: " + (String)(analogRead(7)) + "\t|10: " + (String)(analogRead(10)));
-			Log("2: " + (String)(analogRead(2)) + "\t|5: " + (String)(analogRead(5)) + "\t|8: " + (String)(analogRead(8)) + "\t|11: " + (String)(analogRead(11)));
-			Log("  "+(String)getPlayerChipAmount(4)+"\t|  "+(String)getPlayerChipAmount(1) + "\t|  " + (String)getPlayerChipAmount(2) + "\t|  " + (String)getPlayerChipAmount(3));
-		}
-		else if (data == 'q') {
-			int value = Serial.parseInt();
-			//value = player [1..4]
-			Log("0: "+(String)analogRead(PlayerIRPins[value - 1][0].pin - 100));
-			Log("1: " + (String)analogRead(PlayerIRPins[value - 1][1].pin - 100));
-			Log("2: " + (String)analogRead(PlayerIRPins[value - 1][2].pin - 100));
-		}
-	}
-}*/
 
 //unsigned long startTime;
 
@@ -401,9 +335,7 @@ void loop()
 			}
 		}
 		break;
-	case  IDLE:
-		//idleAnimations(); // Play Idle Animations
-		//newIdleAnimations();
+	case IDLE:
 		handleAnimations();
 		if (checkButtons()) {
 			standbyTmr = millis();
@@ -430,12 +362,7 @@ void loop()
 		
 		break;
 	case GAME:
-		//gameLoop();
 		gameLoop();
-
-		//global IR -> HIGH!!
-		//after game -> LOW
-		//actual game
 		break;
 	default: Log("Unkown state");
 	}

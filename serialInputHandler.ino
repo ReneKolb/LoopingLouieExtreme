@@ -228,7 +228,12 @@ void inline cmd_alternateCD() {
 	else {
 		Log("Error: Wrong data size");
 	}
+}
 
+void inline cmd_requestChips() {
+	digitalWrite((PIN_ADDRESS)GLOBAL_IR, 255);
+	delay(15);
+	Serial1.print("d"+ (String)getPlayerChipAmount(1)+ (String)getPlayerChipAmount(2)+ (String)getPlayerChipAmount(3)+ (String)getPlayerChipAmount(4) +".");
 }
 
 void fillBuffer(boolean usb) {
@@ -249,6 +254,8 @@ int lIndex = -1;
 
 boolean usbAvailable;
 boolean btAvailable;
+
+int pin;
 
 void handleSerialInput() {
 	usbAvailable = Serial.available();
@@ -331,11 +338,29 @@ void handleSerialInput() {
 			fillBuffer(usbAvailable);
 			cmd_alternateCD();
 			break;
-		/*case 'r':
-			break;*/
+		case 'r':
+			fillBuffer(usbAvailable);
+			cmd_requestChips();
+			break;
 		case 's':
 			//start the game
 			initGame();
+			break;
+		case 'A':
+			digitalWrite((PIN_ADDRESS)GLOBAL_IR,255);
+			break;
+		case 'B':
+			digitalWrite((PIN_ADDRESS)GLOBAL_IR, 0);
+			break;
+		case 'C':
+			Serial.println("1: " + (String)analogRead(PlayerIRPins[0][0].pin - 100) + " - " + (String)analogRead(PlayerIRPins[0][1].pin - 100) + " - " + (String)analogRead(PlayerIRPins[0][2].pin - 100));
+			Serial.println("2: " + (String)analogRead(PlayerIRPins[1][0].pin - 100) + " - " + (String)analogRead(PlayerIRPins[1][1].pin - 100) + " - " + (String)analogRead(PlayerIRPins[1][2].pin - 100));
+			Serial.println("3: " + (String)analogRead(PlayerIRPins[2][0].pin - 100) + " - " + (String)analogRead(PlayerIRPins[2][1].pin - 100) + " - " + (String)analogRead(PlayerIRPins[2][2].pin - 100));
+			Serial.println("4: " + (String)analogRead(PlayerIRPins[3][0].pin - 100) + " - " + (String)analogRead(PlayerIRPins[3][1].pin - 100) + " - " + (String)analogRead(PlayerIRPins[3][2].pin - 100));
+			break;
+		case 'D':
+			pin = Serial.parseInt();
+			Serial.println("Read Pin "+(String)pin+" = "+ (String)analogRead(pin));
 			break;
 		case '.':
 			//'.' is the command end symbol. So a actionByte with '.' is no command. --> Ignore

@@ -55,9 +55,13 @@ void setupSpecialButtonLEDs() {
 void setupSpeedButtons() {
 	Log("setup Speed Buttons");
 
+	pinMode(A12, INPUT);
 	digitalWrite(A12, HIGH); // enable AnalogInput pullup resistor
+	pinMode(A13, INPUT);
 	digitalWrite(A13, HIGH); // enable AnalogInput pullup resistor
+	pinMode(A14, INPUT);
 	digitalWrite(A14, HIGH); // enable AnalogInput pullup resistor
+	pinMode(A15, INPUT);
 	digitalWrite(A15, HIGH); // enable AnalogInput pullup resistor
 
 	pinMode((PIN_ADDRESS BUTTON_INC_SPEED_PLAYER1).pin, INPUT);
@@ -73,9 +77,42 @@ void setupSpeedButtons() {
 void setupLightBarriers() {
 	Log("setup Light Barriers");
 	pinMode((PIN_ADDRESS GLOBAL_IR).pin, OUTPUT);
-	digitalWrite(PIN_ADDRESS GLOBAL_IR, HIGH); // TEST: Switch on Lichtschranken!! 
+	digitalWrite(PIN_ADDRESS GLOBAL_IR, LOW);
 
-											   // Die analogen Inputs müssen nicht initialisiert werden (da sie nur eine Funktion haben können)
+	pinMode(A0, INPUT);
+	digitalWrite(A0, LOW);  // disable AnalogInput pullup resistor
+	pinMode(A1, INPUT);
+	digitalWrite(A1, LOW);  // disable AnalogInput pullup resistor
+	pinMode(A2, INPUT);
+	digitalWrite(A2, LOW);  // disable AnalogInput pullup resistor
+	pinMode(A3, INPUT);
+	digitalWrite(A3, LOW);  // disable AnalogInput pullup resistor
+	pinMode(A4, INPUT);
+	digitalWrite(A4, LOW);  // disable AnalogInput pullup resistor
+	pinMode(A5, INPUT);
+	digitalWrite(A5, LOW);  // disable AnalogInput pullup resistor
+	pinMode(A6, INPUT);
+	digitalWrite(A6, LOW);  // disable AnalogInput pullup resistor
+	pinMode(A7, INPUT);
+	digitalWrite(A7, LOW);  // disable AnalogInput pullup resistor
+	pinMode(A8, INPUT);
+	digitalWrite(A8, LOW);  // disable AnalogInput pullup resistor
+	pinMode(A9, INPUT);
+	digitalWrite(A9, LOW);  // disable AnalogInput pullup resistor
+	pinMode(A10, INPUT);
+	digitalWrite(A10, LOW);  // disable AnalogInput pullup resistor
+	pinMode(A11, INPUT);
+	digitalWrite(A11, LOW);  // disable AnalogInput pullup resistor
+
+	//12-15 are speed buttons
+/*	pinMode(A12, INPUT);
+	digitalWrite(A12, LOW);
+	pinMode(A13, INPUT);
+	digitalWrite(A13, LOW);
+	pinMode(A14, INPUT);
+	digitalWrite(A14, LOW);
+	pinMode(A15, INPUT);
+	digitalWrite(A15, LOW);*/
 }
 
 void setupBoosterLEDs() {
