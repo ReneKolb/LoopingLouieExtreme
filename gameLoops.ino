@@ -332,6 +332,9 @@ void gameLoop() {
 									digitalWrite(playerMiddleColors[getPinIndex(i,l, MAX_LEDS_MIDDLE)],0);
 								}
 								setColor(i + 1, Color BLACK);
+								updatePlayerBoosterLEDs(i+1,0);
+								digitalWrite(SpecialButtonLED[i],0);
+
 								playerCount--;
 								//TODO: play "player lose" effect
 								//Log((String)playerCount+" players left");
@@ -430,6 +433,9 @@ void gameLoop() {
 						if (enabledPlayer[i]) {
 							for (int l = 0; l < 5; l++) {
 								digitalWrite(playerMiddleColors[getPinIndex(i,l, MAX_LEDS_MIDDLE)], 255);
+								if (l < 4) {
+									digitalWrite(UVLEDs[getPinIndex(i, l, MAX_LEDS_UV)], 255);
+								}
 							}
 							setColor(i + 1, PlayerColor[i]);
 						}
@@ -437,7 +443,7 @@ void gameLoop() {
 				}
 				else {
 					for (int i = 1; i <= 4; i++) {
-						if (enabledPlayer[i] && checkButtons(i)) {
+						if (enabledPlayer[i - 1] && checkButtons(i)) {
 							//end event -> an enabled! player has pressed a button
 							eventTmr = 0;
 							playerSpecialItemAmount[i - 1]++;
@@ -449,15 +455,15 @@ void gameLoop() {
 								updatePlayerBoosterLEDs(i, playerSpecialItemAmount[i - 1]);
 							}
 
-							for (int i = 0; i < 4; i++) {
-								if (enabledPlayer[i]) {
+							for (int p = 0; p < 4; p++) {
+								if (enabledPlayer[p]) {
 									for (int l = 0; l < 5; l++) {
-										digitalWrite(playerMiddleColors[getPinIndex(i, l, MAX_LEDS_MIDDLE)], 255);
+										digitalWrite(playerMiddleColors[getPinIndex(p, l, MAX_LEDS_MIDDLE)], 255);
 										if (l < 4) {
-											digitalWrite(UVLEDs[getPinIndex(i, l, MAX_LEDS_UV)], 255);
+											digitalWrite(UVLEDs[getPinIndex(p, l, MAX_LEDS_UV)], 255);
 										}
 									}
-									setColor(i + 1, PlayerColor[i]);
+									setColor(p + 1, PlayerColor[p]);
 								}
 							}
 
