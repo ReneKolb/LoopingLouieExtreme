@@ -437,8 +437,8 @@ void gameLoop() {
 				}
 				else {
 					for (int i = 1; i <= 4; i++) {
-						if (checkButtons(i)) {
-							//end event -> a player has pressed a button
+						if (enabledPlayer[i] && checkButtons(i)) {
+							//end event -> an enabled! player has pressed a button
 							eventTmr = 0;
 							playerSpecialItemAmount[i - 1]++;
 							//play Effect
@@ -452,11 +452,15 @@ void gameLoop() {
 							for (int i = 0; i < 4; i++) {
 								if (enabledPlayer[i]) {
 									for (int l = 0; l < 5; l++) {
-										digitalWrite(playerMiddleColors[getPinIndex(i,l, MAX_LEDS_MIDDLE)], 255);
+										digitalWrite(playerMiddleColors[getPinIndex(i, l, MAX_LEDS_MIDDLE)], 255);
+										if (l < 4) {
+											digitalWrite(UVLEDs[getPinIndex(i, l, MAX_LEDS_UV)], 255);
+										}
 									}
 									setColor(i + 1, PlayerColor[i]);
 								}
 							}
+
 							break;
 						}
 					}
