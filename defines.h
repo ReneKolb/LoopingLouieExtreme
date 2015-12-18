@@ -257,7 +257,7 @@ static const PIN_ADDRESS playerCircle[32] = {
 	 PLAYER3_CIRCLE1, PLAYER3_CIRCLE2, PLAYER3_CIRCLE3, PLAYER3_CIRCLE4, PLAYER3_CIRCLE5, PLAYER3_CIRCLE6, PLAYER3_CIRCLE7, PLAYER3_CIRCLE8,
 	 PLAYER4_CIRCLE1, PLAYER4_CIRCLE2, PLAYER4_CIRCLE3, PLAYER4_CIRCLE4, PLAYER4_CIRCLE5, PLAYER4_CIRCLE6, PLAYER4_CIRCLE7, PLAYER4_CIRCLE8
 };
-
+/*
 static const PIN_ADDRESS playerCircleEven[16] = {
 	PLAYER1_CIRCLE2, PLAYER1_CIRCLE4, PLAYER1_CIRCLE6, PLAYER1_CIRCLE8,
 	PLAYER2_CIRCLE2, PLAYER2_CIRCLE4, PLAYER2_CIRCLE6, PLAYER2_CIRCLE8,
@@ -271,7 +271,7 @@ static const PIN_ADDRESS playerCircleOdd[16] = {
 	PLAYER3_CIRCLE1, PLAYER3_CIRCLE3, PLAYER3_CIRCLE5, PLAYER3_CIRCLE7,
 	PLAYER4_CIRCLE1, PLAYER4_CIRCLE3, PLAYER4_CIRCLE5, PLAYER4_CIRCLE7
 };
-
+*/
 // ********** Define Pins: Speed manipulation Buttons ********** 
 #define BUTTON_INC_SPEED_PLAYER2		{0,113} 
 #define BUTTON_DEC_SPEED_PLAYER2		{0,112} 
@@ -717,8 +717,8 @@ static const Color COLOR_LIST[4] = {
 enum AnimationType
 {
 	BLINK, FORWARD, BACKWARD, FORBACKWARD, FILLFORWARD, FILLBACKWARD, FILLFORBACKWARD,
-	//FLIPFLOP
-	COLOR_FORWARD
+	
+	COLOR_FORWARD, COLOR_BACKWARD
 };
 
 
@@ -731,9 +731,10 @@ struct NewAnimation
 	int endIndex;
 	AnimationType animType;
 	int defaultDelay;
+	int extra;
 
-	NewAnimation(const PIN_ADDRESS *pPinLst, int startIdx, int endIdx, AnimationType animTyp,int defaultDel) : pPinList(pPinLst),startIndex(startIdx),endIndex(endIdx),animType(animTyp),defaultDelay(defaultDel){}
-	NewAnimation(const Color *pColorLst, int startIdx, int endIdx, AnimationType animTyp, int defaultDel) : pColorList(pColorLst), startIndex(startIdx), endIndex(endIdx), animType(animTyp), defaultDelay(defaultDel) {}
+	NewAnimation(const PIN_ADDRESS *pPinLst, int startIdx, int endIdx, AnimationType animTyp,int defaultDel, int animExtra = 1) : pPinList(pPinLst),startIndex(startIdx),endIndex(endIdx),animType(animTyp),defaultDelay(defaultDel),extra(animExtra){}
+	NewAnimation(const Color *pColorLst, int startIdx, int endIdx, AnimationType animTyp, int defaultDel, int animExtra = 1) : pColorList(pColorLst), startIndex(startIdx), endIndex(endIdx), animType(animTyp), defaultDelay(defaultDel), extra(animExtra){}
 };
 
 struct AnimationTmr {
@@ -743,31 +744,34 @@ struct AnimationTmr {
 
 NewAnimation AnimationDB[] = {
 	//Booster Display Animation
-/*0*/ 	{ BOOSTER_LEDS,       0,  3,  FILLFORWARD,   100 }, 
-/*1*/ 	{ BOOSTER_LEDS,       4,  7,  FILLBACKWARD,   100 },
-/*2*/ 	{ BOOSTER_LEDS,       8,  11, FILLFORBACKWARD, 100 },
-/*3*/ 	{ BOOSTER_LEDS,       12, 15, FORBACKWARD,   100 },
-/*4*/ 	{ UVLEDs,             0,  15, BLINK,         1500},
-/*5*/ 	{ UVLEDs_OUTER,       0,  7,  BLINK,         1500},
-/*6*/ 	{ UVLEDs_INNER,       0,  7,  BLINK,         640},
-/*7*/ 	{ COLOR_LIST,         0,  3,  COLOR_FORWARD, 160},
+/*0*/ 	{ BOOSTER_LEDS,			0,  3,  FILLFORWARD,		100 }, 
+/*1*/ 	{ BOOSTER_LEDS,			4,  7,  FILLBACKWARD,		100 },
+/*2*/ 	{ BOOSTER_LEDS,			8,  11, FILLFORBACKWARD,	100 },
+/*3*/ 	{ BOOSTER_LEDS,			12, 15, FORBACKWARD,		100 },
+/*4*/ 	{ UVLEDs,				0,  15, BLINK,				1500},
+/*5*/ 	{ UVLEDs_OUTER,			0,  7,  BLINK,				1500},
+/*6*/ 	{ UVLEDs_INNER,			0,  7,  BLINK,				640},
+/*7*/ 	{ COLOR_LIST,			0,  3,  COLOR_FORWARD,		160},
+/*8*/	{ COLOR_LIST,			0,  3,  COLOR_BACKWARD,		160 },
 
-/*8*/	{ playerCircle,       0,  31, FORWARD,      23 },
-/*9*/	{ playerCircle,       0,  31, BACKWARD,      23 },
-/*10*/	{ playerCircle,       0,  31, FILLFORWARD,      23 },
-/*11*/	{ playerCircle,       0,  31, FILLBACKWARD,      23 },
-/*12*/	{ playerCircle,       0,  31, FILLFORBACKWARD,      23 },
-/*13*/	{ playerCircle,       0, 31, FORBACKWARD,   23 },
+/*9*/	{ playerCircle,			0,  31, FORWARD,			23 },
+/*10*/	{ playerCircle,			0,  31, BACKWARD,			23 },
+/*11*/	{ playerCircle,			0,  31, FILLFORWARD,		23 },
+/*12*/	{ playerCircle,			0,  31, FILLBACKWARD,		23 },
+/*13*/	{ playerCircle,			0,  31, FILLFORBACKWARD,	23 },
+/*14*/	{ playerCircle,			0,	31, FORBACKWARD,		23 },
 
-/*14*/	{ playerMiddleColors, 0,  19, FORWARD,	     32 },
-/*15*/	{ playerMiddleColors, 0,  19, BACKWARD,       32 },
-/*16*/	{ playerMiddleColors, 0,  19, FILLFORWARD,       32 },
-/*17*/	{ playerMiddleColors, 0,  19, FILLBACKWARD,       32 },
-/*18*/	{ playerMiddleColors, 0,  19, FILLFORBACKWARD,       32 },
-/*19*/	{ playerMiddleColors, 0, 19, FORBACKWARD,   32 },
+/*15*/	{ playerMiddleColors,	0,  19, FORWARD,			32 },
+/*16*/	{ playerMiddleColors,	0,  19, BACKWARD,			32 },
+/*17*/	{ playerMiddleColors,	0,  19, FILLFORWARD,		32 },
+/*18*/	{ playerMiddleColors,	0,  19, FILLBACKWARD,       32 },
+/*19*/	{ playerMiddleColors,	0,  19, FILLFORBACKWARD,    32 },
+/*20*/	{ playerMiddleColors,	0,	19, FORBACKWARD,		32 },
 
-/*20*/	{ playerCircleEven,       0,  15, BLINK,      800},
-/*21*/	{ playerCircleOdd,       0,  15, BLINK,      800 },
+/*21*/	{ playerCircle,			0,  31, BLINK,				800,	2},
+/*22*/	{ playerCircle,			1,  31, BLINK,				800,	2},
+
+/*23*/	{ playerCircle,			0,	31, FORWARD,			23,		4},
 };
 
 struct CurrentAnimationSettings {

@@ -13,8 +13,8 @@ void setIdleAnimations() {
 	currentAnimations[4] = { 4,-1 };
 	currentAnimations[5] = { 5,-1 };
 	currentAnimations[6] = { 7,-1 };
-	currentAnimations[7] = { 8,-1 };
-	currentAnimations[8] = { 15,-1 };
+	currentAnimations[7] = { 9,-1 };
+	currentAnimations[8] = { 16,-1 };
 	currentAnimations[9] = { -1,-1 };
 }
 
@@ -57,24 +57,34 @@ void handleAnimationStep(NewAnimation &anim, AnimationTmr &animTmr) {
 		if (++animTmr.currentIndex >= 1) {
 			animTmr.currentIndex = -1;
 			for (int j = anim.startIndex; j <= anim.endIndex; j++) {
-				digitalWrite(anim.pPinList[j], 255);
+				if ((anim.startIndex - j) % anim.extra == 0) {
+					digitalWrite(anim.pPinList[j], 255);
+				}
 			}
 		}
 		else {
 			for (int j = anim.startIndex; j <= anim.endIndex; j++) {
-				digitalWrite(anim.pPinList[j], 0);
+				if ((anim.startIndex - j) % anim.extra == 0) {
+					digitalWrite(anim.pPinList[j], 0);
+				}
 			}
 		}
 		break;
 	case FORWARD:
-		oldIndex = animTmr.currentIndex++;
+		oldIndex = animTmr.currentIndex++ - anim.extra + 1;
+		if (oldIndex < 0) {
+			oldIndex = anim.endIndex - anim.startIndex + oldIndex;
+		}
 		if (animTmr.currentIndex > (anim.endIndex - anim.startIndex)) {
 			animTmr.currentIndex = 0; // depending on animType
 		}
 		newIndex = animTmr.currentIndex;
 		break;
 	case BACKWARD:
-		oldIndex = animTmr.currentIndex--;
+		oldIndex = animTmr.currentIndex-- + anim.extra - 1;
+		if (oldIndex > anim.endIndex - anim.startIndex) {
+			oldIndex = anim.endIndex - anim.startIndex - oldIndex;
+		}
 		if (animTmr.currentIndex < 0) {
 			animTmr.currentIndex = anim.endIndex - anim.startIndex; // depending on animType
 		}
@@ -147,6 +157,21 @@ void handleAnimationStep(NewAnimation &anim, AnimationTmr &animTmr) {
 		newNewColor = anim.pColorList[anim.startIndex + newIndex];
 
 		break;
+	case COLOR_BACKWARD:
+		colorMode = true;
+
+		oldPlayerIndex = oldIndex = animTmr.currentIndex--;
+
+		if (animTmr.currentIndex < 0) {
+			animTmr.currentIndex = anim.endIndex - anim.startIndex; // depending on animType
+		}
+		newPlayerIndex = newIndex = animTmr.currentIndex;
+
+		newOldColor = BLACK;
+		newNewColor = anim.pColorList[anim.startIndex + newIndex];
+
+		break;
+
 	default:
 		Log("Unimplemented Animation Type");
 	}

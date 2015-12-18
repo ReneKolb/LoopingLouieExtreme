@@ -10,8 +10,8 @@ enum GameState {
 #define TURBO_DURATION 300
 #define SLOW_DURATION 1000 // 500
 
-#define PHASE1_DURATION 15000
-#define PHASE2_DURATION 25000
+#define PHASE1_DURATION 13000
+#define PHASE2_DURATION 18000
 
 //Game Settings
 //boolean enableSpecialItems = true;
@@ -135,22 +135,137 @@ uint16_t calcAnimationDelay(uint8_t motorSpeed) {
 }
 
 void inline setRandomPhase1Animation() {
-	switch (random(1)) {
+	switch (random(6)) {
 	case 0:
-		setAnimation(0,20);
-		setAnimation(1, 21,-1,0);
+		setAnimation(0, 10); // Circle 
+		setAnimation(1, -1);
+		setAnimation(2, 15); // Middle Start
+		setAnimation(3, -1);  // Middle with offset
+		setAnimation(4, 5, 750); // UVLED OUTER BLINK
+		setAnimation(5, 6, 320); // UVLED INNER BLINK
+		setAnimation(6, 7, 184); //COLOR
+
+		setAnimation(7, -1);
+		setAnimation(8, -1);
 		break;
 	case 1:
-		setAnimation(0, 8); // Circle Start: TODO: 3FORWARD
-		setAnimation(1, 8, -1, 15);  // Circle with offset  
+		setAnimation(0, 9); // Circle 
+		setAnimation(1, -1);
+		setAnimation(2, 16); // Middle Start
+		setAnimation(3, -1);  // Middle with offset
+		setAnimation(4, 5, 750); // UVLED OUTER BLINK
+		setAnimation(5, 6, 320); //UVLED INNET BLINK
+		setAnimation(6, 8, 184); //COLOR
+
+		setAnimation(7, -1);
+		setAnimation(8, -1);
+		break;
+	case 2:
+	case 3:
+		setAnimation(0, 21, 600);
+		setAnimation(1, 22, 600, 0);
+
+		setAnimation(2, -1);
+		setAnimation(3, -1);
+		setAnimation(4, -1);
+		setAnimation(5, -1);
+		setAnimation(6, -1);
+		setAnimation(7, -1);
+		setAnimation(8, -1);
+		break;
+	case 4:
+	case 5:
+		//setAnimation();
+		break;
+	}
+}
+
+void inline setRandomPhase2Animation() {
+	switch (random(6)) {
+	case 0:
+		setAnimation(0, 10); // Circle 
+		setAnimation(1, 10, -1, 15); // Circle with offset  
 		setAnimation(2, 15); // Middle Start
 		setAnimation(3, 15, -1, 9);  // Middle with offset
 		setAnimation(4, 5, 750); // UVLED OUTER BLINK
-		setAnimation(5, 6, 320); // Middle Start
-		setAnimation(6, 7, 184); //COLOR TODO: COLOR_BACKWARD
+		setAnimation(5, 6, 320); // UVLED INNER BLINK
+		setAnimation(6, 7, 184); //COLOR
 
-		setAnimation(7, 8, -1, 7); // Circle Start: TODO: 3FORWARD
-		setAnimation(8, 8, -1, 23);  // Circle with offset  
+		setAnimation(7, -1);
+		setAnimation(8, -1);
+		break;
+	case 1:
+		setAnimation(0, 9); // Circle 
+		setAnimation(1, 9, -1, 15); // Circle with offset  
+		setAnimation(2, 16); // Middle Start
+		setAnimation(3, 16, -1, 9);  // Middle with offset
+		setAnimation(4, 5, 750); // UVLED OUTER BLINK
+		setAnimation(5, 6, 320); //UVLED INNET BLINK
+		setAnimation(6, 8, 184); //COLOR
+
+		setAnimation(7, -1);
+		setAnimation(8, -1);
+		break;
+	case 2:
+	case 3:
+		setAnimation(0, 21, 300);
+		setAnimation(1, 22, 300, 0);
+
+		setAnimation(2,-1);
+		setAnimation(3, -1);
+		setAnimation(4, -1);
+		setAnimation(5, -1);
+		setAnimation(6, -1);
+		setAnimation(7, -1);
+		setAnimation(8, -1);
+		break;
+	case 4:
+	case 5:
+		//setAnimation();
+		break;
+	}
+}
+
+void inline setRandomPhase3Animation() {
+	switch (random(6)) {
+	case 0:
+		setAnimation(0, 10); // Circle 
+		setAnimation(1, 10, -1, 15); // Circle with offset  
+		setAnimation(2, 15); // Middle Start
+		setAnimation(3, 15, -1, 9);  // Middle with offset
+		setAnimation(4, 5, 750); // UVLED OUTER BLINK
+		setAnimation(5, 6, 320); // UVLED INNER BLINK
+		setAnimation(6, 7, 184); //COLOR
+		setAnimation(7, 10, -1, 7); // Circle with offset
+		setAnimation(8, 10, -1, 23);  // Circle with offset  
+		break;
+	case 1:
+		setAnimation(0, 9); // Circle 
+		setAnimation(1, 9, -1, 15); // Circle with offset  
+		setAnimation(2, 16); // Middle Start
+		setAnimation(3, 16, -1, 9);  // Middle with offset
+		setAnimation(4, 5, 750); // UVLED OUTER BLINK
+		setAnimation(5, 6, 320); //UVLED INNET BLINK
+		setAnimation(6, 8, 184); //COLOR
+		setAnimation(7, 9, -1, 7); // Circle with offset
+		setAnimation(8, 9, -1, 23);  // Circle with offset  
+		break;
+	case 2:
+	case 3:
+		setAnimation(0, 21, 150);
+		setAnimation(1, 22, 150, 0);
+
+		setAnimation(2, -1);
+		setAnimation(3, -1);
+		setAnimation(4, -1);
+		setAnimation(5, -1);
+		setAnimation(6, -1);
+		setAnimation(7, -1);
+		setAnimation(8, -1);
+		break;
+	case 4:
+	case 5:
+		//setAnimation();
 		break;
 	}
 }
@@ -159,25 +274,16 @@ void setRandomGameAnim() {
 	Serial.println("GamePhase: "+(String)gamePhase);
 	switch (gamePhase) {
 	case 0:
+		//chill phase
 		setRandomPhase1Animation();
 		break;
 	case 1:
-		setAnimation(0, 9); // Circle Start: TODO: 3FORWARD
-		setAnimation(1, 9, -1, 15); // Circle with offset  
-		setAnimation(2, 14); // Middle Start
-		setAnimation(3, 14, -1, 9);  // Middle with offset
-		setAnimation(4, 5, 750); // UVLED OUTER BLINK
-		setAnimation(5, 6, 320); // Middle Start
-		setAnimation(6, 7, 184); //COLOR
-
-		setAnimation(7, 9, -1, 7); // Circle Start: TODO: 3FORWARD
-		setAnimation(8, 9, -1, 23); // Circle with offset  
+		//normal phase
+		setRandomPhase2Animation();
 		break;
 	case 2:
-		// TODO: Alternierende Lichter
-		break;
-	case 3:
-		// TODO: Kombi aus Fillforward, Fillbackwards, etc.
+		//escalation phase ----> PARTY!!!
+		setRandomPhase3Animation();
 		break;
 	}
 }
@@ -353,13 +459,13 @@ void gameLoop() {
 		}
 
 		if ((unsigned long)(millis() - animationSwitchTmr) > animationSwitchDelay) {
-			animationSwitchDelay = 5000 + random(10001);
+			animationSwitchDelay = 2000 + random(3001);
 			animationSwitchTmr = millis();
 			setRandomGameAnim();
 		}
 
 		if ((unsigned long)(millis() - startTime) > PHASE1_DURATION) {
-			if ((unsigned long)(millis() - startTime) > PHASE2_DURATION) {
+			if ((unsigned long)(millis() - startTime) > (PHASE1_DURATION + PHASE2_DURATION)) {
 				gamePhase = 2;
 			}
 			else {
