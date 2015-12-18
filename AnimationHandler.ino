@@ -6,33 +6,33 @@ void setIdleAnimations() {
 	for (int i = 0; i < 10; i++) {
 		animationTimers[i] = { 0,-1 };
 	}
-	currentAnimations[0] = { 0,-1 };
-	currentAnimations[1] = { 1,-1 };
-	currentAnimations[2] = { 2,-1 };
-	currentAnimations[3] = { 3,-1 };
-	currentAnimations[4] = { 4,-1 };
-	currentAnimations[5] = { 5,-1 };
-	currentAnimations[6] = { 7,-1 };
-	currentAnimations[7] = { 9,-1 };
-	currentAnimations[8] = { 16,-1 };
-	currentAnimations[9] = { -1,-1 };
+	currentAnimations[0] = { 0,-1, DEFAULT_ANIM };
+	currentAnimations[1] = { 1,-1, DEFAULT_ANIM };
+	currentAnimations[2] = { 2,-1, DEFAULT_ANIM };
+	currentAnimations[3] = { 3,-1, DEFAULT_ANIM };
+	currentAnimations[4] = { 4,-1, DEFAULT_ANIM };
+	currentAnimations[5] = { 5,-1, DEFAULT_ANIM };
+	currentAnimations[6] = { 7,-1, DEFAULT_ANIM };
+	currentAnimations[7] = { 9,-1, DEFAULT_ANIM };
+	currentAnimations[8] = { 16,-1, DEFAULT_ANIM };
+	currentAnimations[9] = { -1,-1, DEFAULT_ANIM };
 }
 
 void setNoAnimation() {
 	for (int i = 0; i < 10; i++) {
 		animationTimers[i] = { 0,-1 };
-		currentAnimations[i] = { -1,-1 };
+		currentAnimations[i] = { -1,-1, DEFAULT_ANIM };
 	}
 }
 
 void setNoAnimation(int animationSlot) {
 	animationTimers[animationSlot] = {0,-1};
-	currentAnimations[animationSlot] = { -1,-1 };
+	currentAnimations[animationSlot] = { -1,-1, DEFAULT_ANIM };
 }
 
 void setAnimation(int animationSlot, int animationDBIndex, int overrideDelay = -1, int startOffset = -1) {
 	animationTimers[animationSlot] = { 0,startOffset };
-	currentAnimations[animationSlot] = { animationDBIndex, overrideDelay };
+	currentAnimations[animationSlot] = { animationDBIndex, overrideDelay, AnimationDB[animationDBIndex].animType == RANDOM_FILLS? FILLFORWARD:DEFAULT_ANIM };
 }
 
 void setAnimationDelay(int animationSlot, int overrideDelay) {
@@ -40,7 +40,7 @@ void setAnimationDelay(int animationSlot, int overrideDelay) {
 }
 
 
-void handleAnimationStep(NewAnimation &anim, AnimationTmr &animTmr) {
+void handleAnimationStep(NewAnimation &anim, AnimationTmr &animTmr, CurrentAnimationSettings &animSett) {
 	bool colorMode = false;
 	int oldIndex;
 	int newIndex;
@@ -50,7 +50,7 @@ void handleAnimationStep(NewAnimation &anim, AnimationTmr &animTmr) {
 	Color newOldColor;
 	Color newNewColor;
 
-	switch (anim.animType) {
+	switch (anim.animType==RANDOM_FILLS?animSett.animType:anim.animType) {
 	case BLINK:
 		oldIndex = -1;
 		newIndex = -1;
@@ -112,6 +112,9 @@ void handleAnimationStep(NewAnimation &anim, AnimationTmr &animTmr) {
 			for (int j = anim.startIndex; j <= anim.endIndex; j++) {
 				digitalWrite(anim.pPinList[j], 0);
 			}
+			if (anim.animType == RANDOM_FILLS) {
+				animSett.animType = (random(2) == 0 ? FILLBACKWARD : FILLFORBACKWARD);
+			}
 		}
 		newIndex = animTmr.currentIndex;
 		break;
@@ -122,6 +125,9 @@ void handleAnimationStep(NewAnimation &anim, AnimationTmr &animTmr) {
 			animTmr.currentIndex = anim.endIndex - anim.startIndex; // depending on animType
 			for (int j = anim.startIndex; j <= anim.endIndex; j++) {
 				digitalWrite(anim.pPinList[j], 0);
+			}
+			if (anim.animType == RANDOM_FILLS) {
+				animSett.animType = (random(2) == 0 ? FILLFORWARD : FILLFORBACKWARD);
 			}
 		}
 		newIndex = animTmr.currentIndex;
@@ -136,6 +142,10 @@ void handleAnimationStep(NewAnimation &anim, AnimationTmr &animTmr) {
 			newIndex = -1;
 			if (animTmr.currentIndex > 2 * (anim.endIndex - anim.startIndex)) {
 				animTmr.currentIndex = -1; // depending on animType
+
+				if (anim.animType == RANDOM_FILLS) {
+					animSett.animType = (random(2) == 0 ? FILLFORWARD : FILLBACKWARD);
+				}
 			}
 		}
 		else {
@@ -214,7 +224,7 @@ void handleAnimations() {
 		if (currentAnimations[i].animationDBIndex != -1) {
 			if ((unsigned long)(millis() - animationTimers[i].tmr)>getAnimationDelay(i)) {
 				animationTimers[i].tmr = millis();
-				handleAnimationStep(AnimationDB[currentAnimations[i].animationDBIndex], animationTimers[i]);
+				handleAnimationStep(AnimationDB[currentAnimations[i].animationDBIndex], animationTimers[i], currentAnimations[i]);
 			}
 		}
 	}

@@ -716,7 +716,10 @@ static const Color COLOR_LIST[4] = {
 
 enum AnimationType
 {
+	DEFAULT_ANIM,
+
 	BLINK, FORWARD, BACKWARD, FORBACKWARD, FILLFORWARD, FILLBACKWARD, FILLFORBACKWARD,
+	RANDOM_FILLS,
 	
 	COLOR_FORWARD, COLOR_BACKWARD
 };
@@ -772,11 +775,14 @@ NewAnimation AnimationDB[] = {
 /*22*/	{ playerCircle,			1,  31, BLINK,				800,	2},
 
 /*23*/	{ playerCircle,			0,	31, FORWARD,			23,		4},
+
+/*24*/	{ playerCircle,			0,	31,	RANDOM_FILLS,		23},
 };
 
 struct CurrentAnimationSettings {
 	int animationDBIndex;
 	int delay;
+	AnimationType animType;
 };
 
 // TODO: COLOR!!!

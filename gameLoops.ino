@@ -165,6 +165,7 @@ void inline setRandomPhase1Animation() {
 		setAnimation(0, 21, 600);
 		setAnimation(1, 22, 600, 0);
 
+		//TODO: add middle & UV
 		setAnimation(2, -1);
 		setAnimation(3, -1);
 		setAnimation(4, -1);
@@ -175,7 +176,17 @@ void inline setRandomPhase1Animation() {
 		break;
 	case 4:
 	case 5:
-		//setAnimation();
+		setAnimation(0, 24);
+
+		//TODO: add middle & UV
+		setAnimation(1, -1);
+		setAnimation(2, -1);
+		setAnimation(3, -1);
+		setAnimation(4, -1);
+		setAnimation(5, -1);
+		setAnimation(6, -1);
+		setAnimation(7, -1);
+		setAnimation(8, -1);
 		break;
 	}
 }
@@ -211,6 +222,7 @@ void inline setRandomPhase2Animation() {
 		setAnimation(0, 21, 300);
 		setAnimation(1, 22, 300, 0);
 
+		//TODO: add middle & UV
 		setAnimation(2,-1);
 		setAnimation(3, -1);
 		setAnimation(4, -1);
@@ -221,7 +233,17 @@ void inline setRandomPhase2Animation() {
 		break;
 	case 4:
 	case 5:
-		//setAnimation();
+		setAnimation(0, 24);
+
+		//TODO: add middle & UV
+		setAnimation(1, -1);
+		setAnimation(2, -1);
+		setAnimation(3, -1);
+		setAnimation(4, -1);
+		setAnimation(5, -1);
+		setAnimation(6, -1);
+		setAnimation(7, -1);
+		setAnimation(8, -1);
 		break;
 	}
 }
@@ -255,6 +277,7 @@ void inline setRandomPhase3Animation() {
 		setAnimation(0, 21, 150);
 		setAnimation(1, 22, 150, 0);
 
+		//TODO: add middle & UV
 		setAnimation(2, -1);
 		setAnimation(3, -1);
 		setAnimation(4, -1);
@@ -265,7 +288,17 @@ void inline setRandomPhase3Animation() {
 		break;
 	case 4:
 	case 5:
-		//setAnimation();
+		setAnimation(0, 24);
+
+		//TODO: add middle & UV
+		setAnimation(1, -1);
+		setAnimation(2, -1);
+		setAnimation(3, -1);
+		setAnimation(4, -1);
+		setAnimation(5, -1);
+		setAnimation(6, -1);
+		setAnimation(7, -1);
+		setAnimation(8, -1);
 		break;
 	}
 }
