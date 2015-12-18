@@ -85,6 +85,15 @@ void analogWrite(const PIN_ADDRESS pinAddress, const uint8_t value) {
 	analogWrite(pinAddress.pin, value);
 }
 
+void setMotorSpeed(const int speed) {
+	if (speed >= 0) {
+		setMotorSpeed(true, speed);
+	}
+	else {
+		setMotorSpeed(false, -speed);
+	}
+}
+
 void setMotorSpeed(const boolean forward, uint8_t speed) {
 	if (forward) {
 		digitalWrite(PIN_ADDRESS MOTOR_DIRECTION_A, HIGH);

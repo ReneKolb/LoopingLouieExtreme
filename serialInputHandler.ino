@@ -347,20 +347,8 @@ void handleSerialInput() {
 			initGame();
 			break;
 		case 'A':
-			digitalWrite((PIN_ADDRESS)GLOBAL_IR,255);
-			break;
-		case 'B':
-			digitalWrite((PIN_ADDRESS)GLOBAL_IR, 0);
-			break;
-		case 'C':
-			Serial.println("1: " + (String)analogRead(PlayerIRPins[0][0].pin - 100) + " - " + (String)analogRead(PlayerIRPins[0][1].pin - 100) + " - " + (String)analogRead(PlayerIRPins[0][2].pin - 100));
-			Serial.println("2: " + (String)analogRead(PlayerIRPins[1][0].pin - 100) + " - " + (String)analogRead(PlayerIRPins[1][1].pin - 100) + " - " + (String)analogRead(PlayerIRPins[1][2].pin - 100));
-			Serial.println("3: " + (String)analogRead(PlayerIRPins[2][0].pin - 100) + " - " + (String)analogRead(PlayerIRPins[2][1].pin - 100) + " - " + (String)analogRead(PlayerIRPins[2][2].pin - 100));
-			Serial.println("4: " + (String)analogRead(PlayerIRPins[3][0].pin - 100) + " - " + (String)analogRead(PlayerIRPins[3][1].pin - 100) + " - " + (String)analogRead(PlayerIRPins[3][2].pin - 100));
-			break;
-		case 'D':
 			pin = Serial.parseInt();
-			Serial.println("Read Pin "+(String)pin+" = "+ (String)analogRead(pin));
+			setMotorSpeed(pin);
 			break;
 		case '.':
 			//'.' is the command end symbol. So a actionByte with '.' is no command. --> Ignore

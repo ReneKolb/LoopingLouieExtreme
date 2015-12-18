@@ -10,6 +10,9 @@ enum GameState {
 #define TURBO_DURATION 300
 #define SLOW_DURATION 1000 // 500
 
+#define PHASE1_DURATION 15000
+#define PHASE2_DURATION 25000
+
 //Game Settings
 //boolean enableSpecialItems = true;
 //boolean enableEvents = true;
@@ -47,6 +50,12 @@ uint8_t currentMotorSpeed;
 boolean currentMotorDirection; //true = forward
 unsigned long motorSpeedChangeTmr;
 uint16_t motorSpeedChangeDelay;
+
+unsigned long animationSwitchTmr;
+unsigned long animationSwitchDelay;
+
+unsigned long startTime;
+uint8_t gamePhase;
 
 //uint8_t loser;
 //uint8_t winner;
@@ -125,9 +134,58 @@ uint16_t calcAnimationDelay(uint8_t motorSpeed) {
 	return newDelay;
 }
 
+void inline setRandomPhase1Animation() {
+	switch (random(1)) {
+	case 0:
+		setAnimation(0,20);
+		setAnimation(1, 21,-1,0);
+		break;
+	case 1:
+		setAnimation(0, 8); // Circle Start: TODO: 3FORWARD
+		setAnimation(1, 8, -1, 15);  // Circle with offset  
+		setAnimation(2, 15); // Middle Start
+		setAnimation(3, 15, -1, 9);  // Middle with offset
+		setAnimation(4, 5, 750); // UVLED OUTER BLINK
+		setAnimation(5, 6, 320); // Middle Start
+		setAnimation(6, 7, 184); //COLOR TODO: COLOR_BACKWARD
+
+		setAnimation(7, 8, -1, 7); // Circle Start: TODO: 3FORWARD
+		setAnimation(8, 8, -1, 23);  // Circle with offset  
+		break;
+	}
+}
+
+void setRandomGameAnim() {
+	Serial.println("GamePhase: "+(String)gamePhase);
+	switch (gamePhase) {
+	case 0:
+		setRandomPhase1Animation();
+		break;
+	case 1:
+		setAnimation(0, 9); // Circle Start: TODO: 3FORWARD
+		setAnimation(1, 9, -1, 15); // Circle with offset  
+		setAnimation(2, 14); // Middle Start
+		setAnimation(3, 14, -1, 9);  // Middle with offset
+		setAnimation(4, 5, 750); // UVLED OUTER BLINK
+		setAnimation(5, 6, 320); // Middle Start
+		setAnimation(6, 7, 184); //COLOR
+
+		setAnimation(7, 9, -1, 7); // Circle Start: TODO: 3FORWARD
+		setAnimation(8, 9, -1, 23); // Circle with offset  
+		break;
+	case 2:
+		// TODO: Alternierende Lichter
+		break;
+	case 3:
+		// TODO: Kombi aus Fillforward, Fillbackwards, etc.
+		break;
+	}
+}
+
 void initGame() {
 	Log("Init Game");
 	fullOff();
+	gamePhase = 0;
 	setNoAnimation();
 	state = GAME;
 	gameState = COUNTDOWN;
@@ -273,7 +331,12 @@ void gameLoop() {
 				motorSpeedChangeTmr = millis();
 				eventDelayTmr = millis(); 
 				chefChangeTmr = millis();
-				setAnimation(0, 0,calcAnimationDelay(currentMotorSpeed)); // Circle Animation
+				animationSwitchTmr = millis();
+				animationSwitchDelay = 5000 + random(10001);
+				startTime = millis();
+
+				setRandomGameAnim();
+				
 				Log("Countdown done -> start");
 			}
 			else {
@@ -287,6 +350,21 @@ void gameLoop() {
 		if (eventTmr == 0) {
 			//TODO: Bedingung allgemeiner! aber zum Testen hier speziell
 			handleAnimations();
+		}
+
+		if ((unsigned long)(millis() - animationSwitchTmr) > animationSwitchDelay) {
+			animationSwitchDelay = 5000 + random(10001);
+			animationSwitchTmr = millis();
+			setRandomGameAnim();
+		}
+
+		if ((unsigned long)(millis() - startTime) > PHASE1_DURATION) {
+			if ((unsigned long)(millis() - startTime) > PHASE2_DURATION) {
+				gamePhase = 2;
+			}
+			else {
+				gamePhase = 1;
+			}
 		}
 
 		if (turboTmr != 0) {
@@ -505,7 +583,7 @@ void gameLoop() {
 					currentMotorSpeed = MAX_MOTOR_SPEED - 50;
 				}
 
-				setAnimationDelay(0,calcAnimationDelay(currentMotorSpeed));
+			//	setAnimationDelay(0,calcAnimationDelay(currentMotorSpeed));
 				//animationDelay = calcAnimationDelay(currentMotorSpeed);
 				setMotorSpeed(currentMotorDirection, currentMotorSpeed);
 			}

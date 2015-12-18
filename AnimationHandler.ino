@@ -14,7 +14,7 @@ void setIdleAnimations() {
 	currentAnimations[5] = { 5,-1 };
 	currentAnimations[6] = { 7,-1 };
 	currentAnimations[7] = { 8,-1 };
-	currentAnimations[8] = { 9,-1 };
+	currentAnimations[8] = { 15,-1 };
 	currentAnimations[9] = { -1,-1 };
 }
 
@@ -30,8 +30,8 @@ void setNoAnimation(int animationSlot) {
 	currentAnimations[animationSlot] = { -1,-1 };
 }
 
-void setAnimation(int animationSlot, int animationDBIndex, int overrideDelay = -1) {
-	animationTimers[animationSlot] = { 0,-1 };
+void setAnimation(int animationSlot, int animationDBIndex, int overrideDelay = -1, int startOffset = -1) {
+	animationTimers[animationSlot] = { 0,startOffset };
 	currentAnimations[animationSlot] = { animationDBIndex, overrideDelay };
 }
 
