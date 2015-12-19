@@ -54,6 +54,12 @@ uint16_t motorSpeedChangeDelay;
 unsigned long animationSwitchTmr;
 unsigned long animationSwitchDelay;
 
+unsigned long colorFlashTmr; //used for short light flashes (e.g. loose a chip, display item usage)
+Color colorFlashPlayer[4];
+uint8_t colorFlashDuration;
+uint8_t colorFlashCount;
+boolean colorFlashIsOff;
+
 unsigned long startTime;
 uint8_t gamePhase;
 
@@ -112,6 +118,18 @@ void handleSpecialButton(uint8_t player) {
 			playerSpecialCooldownTmr[player - 1] = millis();
 			updatePlayerBoosterLEDs(player, playerSpecialItemAmount[player - 1]);
 			digitalWrite(SpecialButtonLED[player - 1], 0);
+
+			colorFlashTmr = millis();
+			colorFlashDuration = 200;
+			colorFlashCount = 1;
+			colorFlashIsOff = false;
+			setColor(player, colorFlashPlayer[player-1] = BLUE);
+			for (int i = 0; i < 4; i++) {
+				if (i != player - 1) {
+					colorFlashPlayer[i] = BLACK;
+				}
+			}
+
 			
 			switch (gameSettings.itemType[player - 1]) {
 			case TURBO:
@@ -137,9 +155,9 @@ uint16_t calcAnimationDelay(uint8_t motorSpeed) {
 void inline setRandomPhase1Animation() {
 	switch (random(6)) {
 	case 0:
-		setAnimation(0, 10); // Circle 
+		setAnimation(0, 10, 46); // Circle 
 		setAnimation(1, -1);
-		setAnimation(2, 15); // Middle Start
+		setAnimation(2, 15, 64); // Middle Start
 		setAnimation(3, -1);  // Middle with offset
 		setAnimation(4, 5, 750); // UVLED OUTER BLINK
 		setAnimation(5, 6, 320); // UVLED INNER BLINK
@@ -149,9 +167,9 @@ void inline setRandomPhase1Animation() {
 		setAnimation(8, -1);
 		break;
 	case 1:
-		setAnimation(0, 9); // Circle 
+		setAnimation(0, 9, 46); // Circle 
 		setAnimation(1, -1);
-		setAnimation(2, 16); // Middle Start
+		setAnimation(2, 16, 64); // Middle Start
 		setAnimation(3, -1);  // Middle with offset
 		setAnimation(4, 5, 750); // UVLED OUTER BLINK
 		setAnimation(5, 6, 320); //UVLED INNET BLINK
@@ -338,6 +356,8 @@ void initGame() {
 	animationStep = -1;
 	animationTmr = millis();
 
+	colorFlashTmr = 0;
+
 	enabledPlayer[0] = false;
 	enabledPlayer[1] = false;
 	enabledPlayer[2] = false;
@@ -520,6 +540,43 @@ void gameLoop() {
 			}
 		}
 
+		if (colorFlashTmr != 0) {
+			if ((unsigned long)(millis() - colorFlashTmr) > colorFlashDuration) {
+				if (!colorFlashIsOff) {
+					colorFlashCount--;
+					if (colorFlashCount == 0) {
+						colorFlashTmr = 0;
+					}
+					else {
+						colorFlashTmr = millis();
+					}
+
+					if (!equalColors(colorFlashPlayer[0],Color BLACK))
+						setColor(1, BLACK);
+					if (!equalColors(colorFlashPlayer[1],Color BLACK))
+						setColor(2, BLACK);
+					if (!equalColors(colorFlashPlayer[2],Color BLACK))
+						setColor(3, BLACK);
+					if (!equalColors(colorFlashPlayer[3],Color BLACK))
+						setColor(4, BLACK);
+
+					colorFlashIsOff = true;
+				}else{
+					colorFlashTmr = millis();
+					if (!equalColors(colorFlashPlayer[0], Color BLACK))
+						setColor(1, colorFlashPlayer[0]);
+					if (!equalColors(colorFlashPlayer[1], Color BLACK))
+						setColor(2, colorFlashPlayer[1]);
+					if (!equalColors(colorFlashPlayer[2], Color BLACK))
+						setColor(3, colorFlashPlayer[2]);
+					if (!equalColors(colorFlashPlayer[3], Color BLACK))
+						setColor(4, colorFlashPlayer[3]);
+					colorFlashIsOff = false;
+				}
+			
+			}
+		}
+
 		for (int i = 0; i < 4; i++) {
 			if (enabledPlayer[i]) {
 				//player Loop
@@ -534,6 +591,24 @@ void gameLoop() {
 						uint8_t cnt = getPlayerChipAmount(i + 1);
 						if (cnt != chipCount[i]) { // chip amount is still different -> has really changed
 							//update Chip Count
+							if (cnt < chipCount[i]) {
+								colorFlashTmr = millis();
+								colorFlashDuration = 100;
+								colorFlashCount = 2;
+								colorFlashIsOff = false;
+								if (enabledPlayer[0]) {
+									setColor(1, colorFlashPlayer[0] = PlayerColor[i]);
+								}
+								if (enabledPlayer[1]) {
+									setColor(2, colorFlashPlayer[1] = PlayerColor[i]);
+								}
+								if (enabledPlayer[2]) {
+									setColor(3, colorFlashPlayer[2] = PlayerColor[i]);
+								}
+								if (enabledPlayer[3]) {
+									setColor(4, colorFlashPlayer[3] = PlayerColor[i]);
+								}
+							}
 							chipCount[i] = cnt;
 							//Log("player " + (String)(i + 1) + ": "+(String) cnt+" chips left");
 							if (cnt == 0) {
@@ -574,6 +649,7 @@ void gameLoop() {
 					}
 				}
 
+				//handle Special Item Cooldown
 				if (playerSpecialCooldownTmr[i] != 0 && (unsigned long) (millis()-playerSpecialCooldownTmr[i]) >= ((gameSettings.chefMode&&currentChefIndex==i&&gameSettings.chefHasShorterCooldown)?(SPECIAL_COOLDOWN/3):SPECIAL_COOLDOWN) ) {
 					playerSpecialCooldownTmr[i] = 0;
 					if (playerSpecialItemAmount[i] > 0) {
@@ -582,6 +658,7 @@ void gameLoop() {
 					}
 				}
 
+				//handle Special Items
 				if (gameSettings.enableItems && eventTmr == 0) {
 					//only when no event is in progress, a player can use special items
 					if (isButtonPressed(SpecialButton[i])) {
@@ -740,19 +817,7 @@ void gameLoop() {
 				Log("new Chef: "+(String)(currentChefIndex+1));
 			}
 		}
-
-	/*	if (eventTmr == 0) {
-			//only handle game animation when no event is in progress
-			if ((unsigned long)(millis() - animationTmr) > animationDelay) {
-				animationTmr = millis();
-				animationStep++;
-				if (animationStep >= circleSquenceGame.maxStep) {
-					animationStep = 0;
-				}
-				DoAnimationStep(circleSquenceGame.LEDs[animationStep], circleSquenceGame.maxLED);
-			}
-		}*/
-		
+	
 		break;
 	case OUTRO:
 		//play final effects

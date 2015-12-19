@@ -29,6 +29,11 @@ void Log(String msg) {
 	}
 }
 
+boolean equalColors(const Color col1, const Color col2) {
+	return col1.r == col2.r && col1.g == col2.g && col1.b == col2.b;
+
+}
+
 void digitalWrite(const PIN_ADDRESS pinAddress, const uint8_t value) {
 	if (pinAddress.pin >= 54 && pinAddress.pin <= 69) {
 		Log("Trying to write analog-Input pin");
@@ -325,11 +330,11 @@ void setup()
 	Log("setup done.");
 }
 
-//unsigned long startTime;
+//unsigned long startDebugTime;
 
 void loop()
 {
-	//startTime = millis();
+	//startDebugTime = millis();
 
 	switch (state) {
 	case STANDBY:
@@ -385,8 +390,8 @@ void loop()
 		//handleBTSerialInput();
 	}
 
-/*	unsigned long cycleTime = (millis() - startTime);
-	if (cycleTime > 5) {
+	/*unsigned long cycleTime = (millis() - startDebugTime);
+	if (cycleTime > 10) {
 		Log("Cycle Time: " + (String)cycleTime);
 	}*/
 }

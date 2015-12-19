@@ -113,7 +113,17 @@ void handleAnimationStep(NewAnimation &anim, AnimationTmr &animTmr, CurrentAnima
 				digitalWrite(anim.pPinList[j], 0);
 			}
 			if (anim.animType == RANDOM_FILLS) {
-				animSett.animType = (random(2) == 0 ? FILLBACKWARD : FILLFORBACKWARD);
+				switch (random(3)) {
+				/*case 0:
+					animSett.animType = FILLFORWARD;
+					break;*/
+				case 1:
+					animSett.animType = FILLBACKWARD;
+					break;
+				case 2:
+					animSett.animType = FILLFORBACKWARD;
+					break;
+				}
 			}
 		}
 		newIndex = animTmr.currentIndex;
@@ -127,7 +137,17 @@ void handleAnimationStep(NewAnimation &anim, AnimationTmr &animTmr, CurrentAnima
 				digitalWrite(anim.pPinList[j], 0);
 			}
 			if (anim.animType == RANDOM_FILLS) {
-				animSett.animType = (random(2) == 0 ? FILLFORWARD : FILLFORBACKWARD);
+				switch (random(3)) {
+				case 0:
+					animSett.animType = FILLFORWARD;
+					break;
+				/*case 1:
+					animSett.animType = FILLBACKWARD;
+					break;*/
+				case 2:
+					animSett.animType = FILLFORBACKWARD;
+					break;
+				}
 			}
 		}
 		newIndex = animTmr.currentIndex;
@@ -144,7 +164,17 @@ void handleAnimationStep(NewAnimation &anim, AnimationTmr &animTmr, CurrentAnima
 				animTmr.currentIndex = -1; // depending on animType
 
 				if (anim.animType == RANDOM_FILLS) {
-					animSett.animType = (random(2) == 0 ? FILLFORWARD : FILLBACKWARD);
+					switch (random(3)) {
+					case 0:
+						animSett.animType = FILLFORWARD;
+						break;
+					case 1:
+						animSett.animType = FILLBACKWARD;
+						break;
+					/*case 2:
+						animSett.animType = FILLFORBACKWARD;
+						break;*/
+					}
 				}
 			}
 		}
