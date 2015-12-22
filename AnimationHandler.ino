@@ -10,27 +10,52 @@ void setIdleAnimations() {
 	currentAnimations[1] = { 1,-1, DEFAULT_ANIM };
 	currentAnimations[2] = { 2,-1, DEFAULT_ANIM };
 	currentAnimations[3] = { 3,-1, DEFAULT_ANIM };
-	currentAnimations[4] = { 4,-1, DEFAULT_ANIM };
-	currentAnimations[5] = { 5,-1, DEFAULT_ANIM };
+	currentAnimations[4] = { 5,-1, DEFAULT_ANIM };
+	currentAnimations[5] = { 6,-1, DEFAULT_ANIM };
 	currentAnimations[6] = { 7,-1, DEFAULT_ANIM };
 	currentAnimations[7] = { 9,-1, DEFAULT_ANIM };
 	currentAnimations[8] = { 16,-1, DEFAULT_ANIM };
 	currentAnimations[9] = { -1,-1, DEFAULT_ANIM };
 }
 
+void animationLEDsOff(int animationDBIndex) {
+	NewAnimation *anim;
+	anim = &AnimationDB[animationDBIndex];
+	if(anim->animType== COLOR_BACKWARD||anim->animType == COLOR_FORWARD){
+		setColor(1, Color BLACK);
+		setColor(2, Color BLACK);
+		setColor(3, Color BLACK);
+		setColor(4, Color BLACK);
+	}
+	else {
+		for (int i = anim->startIndex; i <= anim->endIndex; i++) {
+			digitalWrite(anim->pPinList[i],0);
+		}
+	}
+}
+
 void setNoAnimation() {
 	for (int i = 0; i < 10; i++) {
+		if (currentAnimations[i].animationDBIndex != -1) {
+			animationLEDsOff(currentAnimations[i].animationDBIndex);
+		}
 		animationTimers[i] = { 0,-1 };
 		currentAnimations[i] = { -1,-1, DEFAULT_ANIM };
 	}
 }
 
 void setNoAnimation(int animationSlot) {
+	if (currentAnimations[animationSlot].animationDBIndex != -1) {
+		animationLEDsOff(currentAnimations[animationSlot].animationDBIndex);
+	}
 	animationTimers[animationSlot] = {0,-1};
 	currentAnimations[animationSlot] = { -1,-1, DEFAULT_ANIM };
 }
 
 void setAnimation(int animationSlot, int animationDBIndex, int overrideDelay = -1, int startOffset = -1) {
+	if (currentAnimations[animationSlot].animationDBIndex != -1) {
+		animationLEDsOff(currentAnimations[animationSlot].animationDBIndex);
+	}
 	animationTimers[animationSlot] = { 0,startOffset };
 	currentAnimations[animationSlot] = { animationDBIndex, overrideDelay, AnimationDB[animationDBIndex].animType == RANDOM_FILLS? FILLFORWARD:DEFAULT_ANIM };
 }
@@ -212,6 +237,34 @@ void handleAnimationStep(NewAnimation &anim, AnimationTmr &animTmr, CurrentAnima
 
 		break;
 
+	case COLOR_ROTATE:
+		colorMode = true;
+		animTmr.currentIndex++;
+		if (animTmr.currentIndex >= 4) {
+			animTmr.currentIndex = 0;
+		}
+		for (int i = 1; i <= 4; i++) {
+			setColor(i, anim.pColorList[(i - 1 + animTmr.currentIndex) % 4]);
+		}
+
+		oldIndex = -1;
+		newIndex = -1;
+		break;
+
+	case COLOR_ROTATE_BACKWARDS:
+		colorMode = true;
+		animTmr.currentIndex--;
+		if (animTmr.currentIndex < 0) {
+			animTmr.currentIndex = 3;
+		}
+		for (int i = 1; i <= 4; i++) {
+			setColor(i, anim.pColorList[(i - 1 + animTmr.currentIndex) % 4]);
+		}
+
+		oldIndex = -1;
+		newIndex = -1;
+		break;
+
 	default:
 		Log("Unimplemented Animation Type");
 	}
@@ -234,6 +287,7 @@ void handleAnimationStep(NewAnimation &anim, AnimationTmr &animTmr, CurrentAnima
 			digitalWrite(anim.pPinList[anim.startIndex + newIndex], 255);
 		}
 	}
+
 }
 
 int getAnimationDelay(int animationSlot) {

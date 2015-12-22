@@ -234,6 +234,7 @@ void inline cmd_requestChips() {
 	digitalWrite((PIN_ADDRESS)GLOBAL_IR, 255);
 	delay(15);
 	Serial1.print("d"+ (String)getPlayerChipAmount(1)+ (String)getPlayerChipAmount(2)+ (String)getPlayerChipAmount(3)+ (String)getPlayerChipAmount(4) +".");
+	digitalWrite((PIN_ADDRESS)GLOBAL_IR, 0);
 }
 
 void fillBuffer(boolean usb) {
@@ -349,6 +350,22 @@ void handleSerialInput() {
 		case 'A':
 			pin = Serial.parseInt();
 			setMotorSpeed(pin);
+			break;
+		case 'B':
+			digitalWrite((PIN_ADDRESS)GLOBAL_IR, 255);
+			Log("IR on");
+			break;
+		case 'C':
+			digitalWrite((PIN_ADDRESS)GLOBAL_IR, 0);
+			Log("IR off");
+			break;
+		case 'D':
+	//		pin = Serial.parseInt(); //player
+			Serial.println("IR-Status:");
+			Serial.println((String)analogRead(A3) + "\t" + (String)analogRead(A4) + "\t" + (String)analogRead(A5));
+			Serial.println((String)analogRead(A6) + "\t" + (String)analogRead(A7) + "\t" + (String)analogRead(A8));
+			Serial.println((String)analogRead(A9) + "\t" + (String)analogRead(A10) + "\t" + (String)analogRead(A11));
+			Serial.println((String)analogRead(A0) + "\t" + (String)analogRead(A1) + "\t" + (String)analogRead(A2));
 			break;
 		case '.':
 			//'.' is the command end symbol. So a actionByte with '.' is no command. --> Ignore

@@ -32,6 +32,9 @@ uint16_t eventDelay;
 unsigned long eventTmr;
 #define EVENT_DURATION 1500
 
+unsigned long eventAnnounceTmr;
+int eventAnnouncePhase;
+
 unsigned long playerSpecialCooldownTmr[4];
 uint8_t playerSpecialItemAmount[4];
 //SpecialItemType playerSpecialItemType[4];
@@ -120,8 +123,8 @@ void handleSpecialButton(uint8_t player) {
 			digitalWrite(SpecialButtonLED[player - 1], 0);
 
 			colorFlashTmr = millis();
-			colorFlashDuration = 200;
-			colorFlashCount = 1;
+			colorFlashDuration = 150;
+			colorFlashCount = 2;
 			colorFlashIsOff = false;
 			setColor(player, colorFlashPlayer[player-1] = BLUE);
 			for (int i = 0; i < 4; i++) {
@@ -180,20 +183,32 @@ void inline setRandomPhase1Animation() {
 		break;
 	case 2:
 	case 3:
+		setColor(1, BLACK);
+		setColor(2, BLACK);
+		setColor(3, BLACK);
+		setColor(4, BLACK);
+		digitalWrites(playerMiddleColors, 0, 19, 0);
+
 		setAnimation(0, 21, 600);
 		setAnimation(1, 22, 600, 0);
 
 		//TODO: add middle & UV
 		setAnimation(2, -1);
 		setAnimation(3, -1);
-		setAnimation(4, -1);
-		setAnimation(5, -1);
+		setAnimation(4, 5, 600);
+		setAnimation(5, 6, 400);
 		setAnimation(6, -1);
 		setAnimation(7, -1);
 		setAnimation(8, -1);
 		break;
 	case 4:
 	case 5:
+		setColor(1, BLACK);
+		setColor(2, BLACK);
+		setColor(3, BLACK);
+		setColor(4, BLACK);
+		digitalWrites(playerMiddleColors, 0, 19, 0);
+
 		setAnimation(0, 24);
 
 		//TODO: add middle & UV
@@ -237,20 +252,32 @@ void inline setRandomPhase2Animation() {
 		break;
 	case 2:
 	case 3:
+		setColor(1, BLACK);
+		setColor(2, BLACK);
+		setColor(3, BLACK);
+		setColor(4, BLACK);
+		digitalWrites(playerMiddleColors, 0, 19, 0);
+
 		setAnimation(0, 21, 300);
 		setAnimation(1, 22, 300, 0);
 
 		//TODO: add middle & UV
 		setAnimation(2,-1);
 		setAnimation(3, -1);
-		setAnimation(4, -1);
-		setAnimation(5, -1);
+		setAnimation(4, 5,300);
+		setAnimation(5, 6,200);
 		setAnimation(6, -1);
 		setAnimation(7, -1);
 		setAnimation(8, -1);
 		break;
 	case 4:
 	case 5:
+		setColor(1, BLACK);
+		setColor(2, BLACK);
+		setColor(3, BLACK);
+		setColor(4, BLACK);
+		digitalWrites(playerMiddleColors, 0, 19, 0);
+
 		setAnimation(0, 24);
 
 		//TODO: add middle & UV
@@ -292,20 +319,32 @@ void inline setRandomPhase3Animation() {
 		break;
 	case 2:
 	case 3:
+		setColor(1, BLACK);
+		setColor(2, BLACK);
+		setColor(3, BLACK);
+		setColor(4, BLACK);
+		digitalWrites(playerMiddleColors, 0,19,0);
+
 		setAnimation(0, 21, 150);
 		setAnimation(1, 22, 150, 0);
 
 		//TODO: add middle & UV
 		setAnimation(2, -1);
 		setAnimation(3, -1);
-		setAnimation(4, -1);
-		setAnimation(5, -1);
+		setAnimation(4, 5, 150);
+		setAnimation(5, 6, 100);
 		setAnimation(6, -1);
 		setAnimation(7, -1);
 		setAnimation(8, -1);
 		break;
 	case 4:
 	case 5:
+		setColor(1, BLACK);
+		setColor(2, BLACK);
+		setColor(3, BLACK);
+		setColor(4, BLACK);
+		digitalWrites(playerMiddleColors, 0, 19, 0);
+
 		setAnimation(0, 24);
 
 		//TODO: add middle & UV
@@ -396,6 +435,9 @@ void initGame() {
 	eventDelayTmr = 0;
 	eventDelay = 5000 + random(5000);
 	eventTmr = 0;
+
+	eventAnnouncePhase = -1;
+	eventAnnounceTmr = 0;
 
 	//loser = 255;
 	//winner = 255;
@@ -511,7 +553,7 @@ void gameLoop() {
 			handleAnimations();
 		}
 
-		if ((unsigned long)(millis() - animationSwitchTmr) > animationSwitchDelay) {
+		if (eventAnnouncePhase == -1 && eventTmr == 0 && (unsigned long)(millis() - animationSwitchTmr) > animationSwitchDelay) {
 			animationSwitchDelay = 2000 + random(3001);
 			animationSwitchTmr = millis();
 			setRandomGameAnim();
@@ -577,6 +619,27 @@ void gameLoop() {
 			}
 		}
 
+		if (eventAnnouncePhase != -1) {
+			if ((unsigned long)(millis() - eventAnnounceTmr) > 1500) {
+				eventAnnouncePhase++;
+				if (eventAnnouncePhase >= 3) {
+					eventAnnouncePhase = -1;
+					eventAnnounceTmr = 0;
+					//Start event
+					eventDelayTmr = millis();
+					eventDelay = EVENT_DURATION + 4500 + random(7000);
+					eventTmr = millis();
+
+					//signalize that an event has started
+					fullOff(false, false);
+				}
+				else {
+					eventAnnounceTmr = millis();
+					setAnimation(6,25+eventAnnouncePhase);
+				}
+			}
+		}
+
 		for (int i = 0; i < 4; i++) {
 			if (enabledPlayer[i]) {
 				//player Loop
@@ -625,7 +688,7 @@ void gameLoop() {
 								}
 								setColor(i + 1, Color BLACK);
 								updatePlayerBoosterLEDs(i+1,0);
-								digitalWrite(SpecialButtonLED[i],0);
+								//digitalWrite(SpecialButtonLED[i],0);
 
 								playerCount--;
 								//TODO: play "player lose" effect
@@ -709,21 +772,29 @@ void gameLoop() {
 
 		  // ********** handle events **********
 		if (gameSettings.enableEvents) {
-			if ((unsigned long)(millis() - eventDelayTmr) > eventDelay) {
-				//executeEvent
-				eventDelayTmr = millis();
+			if (eventDelayTmr != 0 && (unsigned long)(millis() - eventDelayTmr) > eventDelay) {
+				//Announce Event
+				eventAnnouncePhase = 0;
+				eventAnnounceTmr = millis();
+
+				setNoAnimation();
+				setAnimation(6, 25);
+				eventDelayTmr = 0;
+				
+			/*	eventDelayTmr = millis();
 				eventDelay = EVENT_DURATION + 4500 + random(7000);
 				eventTmr = millis();
 
 				//signalize that an event has started
-				fullOff(false, false);
+				fullOff(false, false);*/
 			}
 
 			if (eventTmr != 0) {
 				if ((unsigned long)(millis() - eventTmr) > EVENT_DURATION) {
 					eventTmr = 0; //cancel event
+					setRandomGameAnim();
 					//TEST
-					for (int i = 0; i < 4; i++) {
+				/*	for (int i = 0; i < 4; i++) {
 						if (enabledPlayer[i]) {
 							for (int l = 0; l < 5; l++) {
 								digitalWrite(playerMiddleColors[getPinIndex(i,l, MAX_LEDS_MIDDLE)], 255);
@@ -733,7 +804,7 @@ void gameLoop() {
 							}
 							setColor(i + 1, PlayerColor[i]);
 						}
-					}
+					}*/
 				}
 				else {
 					for (int i = 1; i <= 4; i++) {
@@ -749,7 +820,18 @@ void gameLoop() {
 								updatePlayerBoosterLEDs(i, playerSpecialItemAmount[i - 1]);
 							}
 
-							for (int p = 0; p < 4; p++) {
+							colorFlashTmr = millis();
+							colorFlashDuration = 100;
+							colorFlashCount = 3;
+							colorFlashIsOff = false;
+							setColor(1, (colorFlashPlayer[0] = PlayerColor[i-1]));
+							setColor(2, (colorFlashPlayer[1] = PlayerColor[i - 1]));
+							setColor(3, (colorFlashPlayer[2] = PlayerColor[i - 1]));
+							setColor(4, (colorFlashPlayer[3] = PlayerColor[i - 1]));
+
+							setRandomGameAnim();
+
+						/*	for (int p = 0; p < 4; p++) {
 								if (enabledPlayer[p]) {
 									for (int l = 0; l < 5; l++) {
 										digitalWrite(playerMiddleColors[getPinIndex(p, l, MAX_LEDS_MIDDLE)], 255);
@@ -759,7 +841,7 @@ void gameLoop() {
 									}
 									setColor(p + 1, PlayerColor[p]);
 								}
-							}
+							}*/
 
 							break;
 						}

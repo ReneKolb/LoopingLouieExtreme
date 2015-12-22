@@ -80,29 +80,29 @@ void setupLightBarriers() {
 	digitalWrite(PIN_ADDRESS GLOBAL_IR, LOW);
 
 	pinMode(A0, INPUT);
-	digitalWrite(A0, HIGH);  // disable AnalogInput pullup resistor
+	digitalWrite(A0, LOW);  // disable AnalogInput pullup resistor
 	pinMode(A1, INPUT);
-	digitalWrite(A1, HIGH);  // disable AnalogInput pullup resistor
+	digitalWrite(A1, LOW);  // disable AnalogInput pullup resistor
 	pinMode(A2, INPUT);
-	digitalWrite(A2, HIGH);  // disable AnalogInput pullup resistor
+	digitalWrite(A2, LOW);  // disable AnalogInput pullup resistor
 	pinMode(A3, INPUT);
-	digitalWrite(A3, HIGH);  // disable AnalogInput pullup resistor
+	digitalWrite(A3, LOW);  // disable AnalogInput pullup resistor
 	pinMode(A4, INPUT);
-	digitalWrite(A4, HIGH);  // disable AnalogInput pullup resistor
+	digitalWrite(A4, LOW);  // disable AnalogInput pullup resistor
 	pinMode(A5, INPUT);
-	digitalWrite(A5, HIGH);  // disable AnalogInput pullup resistor
+	digitalWrite(A5, LOW);  // disable AnalogInput pullup resistor
 	pinMode(A6, INPUT);
-	digitalWrite(A6, HIGH);  // disable AnalogInput pullup resistor
+	digitalWrite(A6, LOW);  // disable AnalogInput pullup resistor
 	pinMode(A7, INPUT);
-	digitalWrite(A7, HIGH);  // disable AnalogInput pullup resistor
+	digitalWrite(A7, LOW);  // disable AnalogInput pullup resistor
 	pinMode(A8, INPUT);
-	digitalWrite(A8, HIGH);  // disable AnalogInput pullup resistor
+	digitalWrite(A8, LOW);  // disable AnalogInput pullup resistor
 	pinMode(A9, INPUT);
-	digitalWrite(A9, HIGH);  // disable AnalogInput pullup resistor
+	digitalWrite(A9, LOW);  // disable AnalogInput pullup resistor
 	pinMode(A10, INPUT);
-	digitalWrite(A10, HIGH);  // disable AnalogInput pullup resistor
+	digitalWrite(A10, LOW);  // disable AnalogInput pullup resistor
 	pinMode(A11, INPUT);
-	digitalWrite(A11, HIGH);  // disable AnalogInput pullup resistor
+	digitalWrite(A11, LOW);  // disable AnalogInput pullup resistor
 
 	//12-15 are speed buttons
 /*	pinMode(A12, INPUT);

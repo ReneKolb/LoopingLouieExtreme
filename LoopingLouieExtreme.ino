@@ -61,6 +61,13 @@ void digitalWrite(const PIN_ADDRESS pinAddress, const uint8_t value) {
 	}
 }
 
+void digitalWrites(const PIN_ADDRESS *pPinList, int startIndex, int endIndex, const uint8_t value) {
+	for (int i = startIndex; i <= endIndex; i++) {
+		digitalWrite(pPinList[i], value);
+	}
+
+}
+
 uint8_t digitalRead(const PIN_ADDRESS pinAddress) {
 	switch (pinAddress.board) {
 	case 0:
