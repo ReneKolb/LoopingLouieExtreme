@@ -65,7 +65,6 @@ void digitalWrites(const PIN_ADDRESS *pPinList, int startIndex, int endIndex, co
 	for (int i = startIndex; i <= endIndex; i++) {
 		digitalWrite(pPinList[i], value);
 	}
-
 }
 
 uint8_t digitalRead(const PIN_ADDRESS pinAddress) {
@@ -158,7 +157,7 @@ boolean checkButtons() {
 }
 
 
-void updatePlayerBoosterLEDs(const uint8_t player, const uint8_t amount) {
+void updatePlayerBoosterLEDs(const uint8_t player, const uint8_t amount, const boolean updateButtonLED=false) {
 	for (int i = 0; i < 4; i++) {
 		if (amount > i) {
 			//digitalWrite(BOOSTER_LEDS[player - 1][i], HIGH);
@@ -168,6 +167,9 @@ void updatePlayerBoosterLEDs(const uint8_t player, const uint8_t amount) {
 			//digitalWrite(BOOSTER_LEDS[player - 1][i], LOW);
 			digitalWrite(BOOSTER_LEDS[getPinIndex(player - 1, i, MAX_LEDS_BOOSTER)], LOW);
 		}
+	}
+	if (updateButtonLED) {
+		digitalWrite(SpecialButtonLED[player-1],amount>0);
 	}
 }
 

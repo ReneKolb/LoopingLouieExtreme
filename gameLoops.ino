@@ -119,7 +119,7 @@ void handleSpecialButton(uint8_t player) {
 		if (playerSpecialItemAmount[player - 1] >= 1) {
 			playerSpecialItemAmount[player - 1]--;
 			playerSpecialCooldownTmr[player - 1] = millis();
-			updatePlayerBoosterLEDs(player, playerSpecialItemAmount[player - 1]);
+			updatePlayerBoosterLEDs(player, playerSpecialItemAmount[player - 1],false);
 			digitalWrite(SpecialButtonLED[player - 1], 0);
 
 			colorFlashTmr = millis();
@@ -183,41 +183,42 @@ void inline setRandomPhase1Animation() {
 		break;
 	case 2:
 	case 3:
-		setColor(1, BLACK);
-		setColor(2, BLACK);
-		setColor(3, BLACK);
-		setColor(4, BLACK);
+		setColor(1, Color BLACK);
+		setColor(2, Color BLACK);
+		setColor(3, Color BLACK);
+		setColor(4, Color BLACK);
 		digitalWrites(playerMiddleColors, 0, 19, 0);
 
 		setAnimation(0, 21, 600);
 		setAnimation(1, 22, 600, 0);
 
 		//TODO: add middle & UV
-		setAnimation(2, -1);
-		setAnimation(3, -1);
+		setAnimation(2, 28, 600);
+		setAnimation(3, 29, 600, 0);
 		setAnimation(4, 5, 600);
 		setAnimation(5, 6, 400);
 		setAnimation(6, -1);
 		setAnimation(7, -1);
 		setAnimation(8, -1);
+
 		break;
 	case 4:
 	case 5:
-		setColor(1, BLACK);
-		setColor(2, BLACK);
-		setColor(3, BLACK);
-		setColor(4, BLACK);
+		setColor(1, Color BLACK);
+		setColor(2, Color BLACK);
+		setColor(3, Color BLACK);
+		setColor(4, Color BLACK);
 		digitalWrites(playerMiddleColors, 0, 19, 0);
 
 		setAnimation(0, 24);
 
 		//TODO: add middle & UV
 		setAnimation(1, -1);
-		setAnimation(2, -1);
+		setAnimation(2, 30);
 		setAnimation(3, -1);
-		setAnimation(4, -1);
-		setAnimation(5, -1);
-		setAnimation(6, -1);
+		setAnimation(4, 5, 600);
+		setAnimation(5, 6, 400);
+		setAnimation(6, 7);
 		setAnimation(7, -1);
 		setAnimation(8, -1);
 		break;
@@ -252,41 +253,41 @@ void inline setRandomPhase2Animation() {
 		break;
 	case 2:
 	case 3:
-		setColor(1, BLACK);
-		setColor(2, BLACK);
-		setColor(3, BLACK);
-		setColor(4, BLACK);
+		setColor(1, Color BLACK);
+		setColor(2, Color BLACK);
+		setColor(3, Color BLACK);
+		setColor(4, Color BLACK);
 		digitalWrites(playerMiddleColors, 0, 19, 0);
 
 		setAnimation(0, 21, 300);
 		setAnimation(1, 22, 300, 0);
 
 		//TODO: add middle & UV
-		setAnimation(2,-1);
-		setAnimation(3, -1);
-		setAnimation(4, 5,300);
-		setAnimation(5, 6,200);
-		setAnimation(6, -1);
+		setAnimation(2, 28, 300);
+		setAnimation(3, 29, 300, 0);
+		setAnimation(4, 5, 300);
+		setAnimation(5, 6, 200);
+		setAnimation(6, 8, 184);
 		setAnimation(7, -1);
 		setAnimation(8, -1);
 		break;
 	case 4:
 	case 5:
-		setColor(1, BLACK);
-		setColor(2, BLACK);
-		setColor(3, BLACK);
-		setColor(4, BLACK);
+		setColor(1, Color BLACK);
+		setColor(2, Color BLACK);
+		setColor(3, Color BLACK);
+		setColor(4, Color BLACK);
 		digitalWrites(playerMiddleColors, 0, 19, 0);
 
-		setAnimation(0, 24);
+		setAnimation(0, 24, 18);
 
 		//TODO: add middle & UV
 		setAnimation(1, -1);
-		setAnimation(2, -1);
+		setAnimation(2, 30, 25);
 		setAnimation(3, -1);
-		setAnimation(4, -1);
-		setAnimation(5, -1);
-		setAnimation(6, -1);
+		setAnimation(4, 5, 300);
+		setAnimation(5, 6, 200);
+		setAnimation(6, 7, 184);
 		setAnimation(7, -1);
 		setAnimation(8, -1);
 		break;
@@ -319,21 +320,21 @@ void inline setRandomPhase3Animation() {
 		break;
 	case 2:
 	case 3:
-		setColor(1, BLACK);
-		setColor(2, BLACK);
-		setColor(3, BLACK);
-		setColor(4, BLACK);
+		setColor(1, Color BLACK);
+		setColor(2, Color BLACK);
+		setColor(3, Color BLACK);
+		setColor(4, Color BLACK);
 		digitalWrites(playerMiddleColors, 0,19,0);
 
 		setAnimation(0, 21, 150);
 		setAnimation(1, 22, 150, 0);
 
 		//TODO: add middle & UV
-		setAnimation(2, -1);
-		setAnimation(3, -1);
+		setAnimation(2, 28, 110);
+		setAnimation(3, 29, 110, 0);
 		setAnimation(4, 5, 150);
 		setAnimation(5, 6, 100);
-		setAnimation(6, -1);
+		setAnimation(6, 31);
 		setAnimation(7, -1);
 		setAnimation(8, -1);
 		break;
@@ -345,15 +346,15 @@ void inline setRandomPhase3Animation() {
 		setColor(4, BLACK);
 		digitalWrites(playerMiddleColors, 0, 19, 0);
 
-		setAnimation(0, 24);
+		setAnimation(0, 24, 12);
 
 		//TODO: add middle & UV
 		setAnimation(1, -1);
-		setAnimation(2, -1);
+		setAnimation(2, 30, 17);
 		setAnimation(3, -1);
-		setAnimation(4, -1);
-		setAnimation(5, -1);
-		setAnimation(6, -1);
+		setAnimation(4, 5, 150);
+		setAnimation(5, 6, 100);
+		setAnimation(6, 31);
 		setAnimation(7, -1);
 		setAnimation(8, -1);
 		break;
@@ -433,7 +434,7 @@ void initGame() {
 	slowTmr = 0;
 
 	eventDelayTmr = 0;
-	eventDelay = 5000 + random(5000);
+	eventDelay = 12000 + random(5000);
 	eventTmr = 0;
 
 	eventAnnouncePhase = -1;
@@ -605,6 +606,7 @@ void gameLoop() {
 					colorFlashIsOff = true;
 				}else{
 					colorFlashTmr = millis();
+
 					if (!equalColors(colorFlashPlayer[0], Color BLACK))
 						setColor(1, colorFlashPlayer[0]);
 					if (!equalColors(colorFlashPlayer[1], Color BLACK))
@@ -613,6 +615,7 @@ void gameLoop() {
 						setColor(3, colorFlashPlayer[2]);
 					if (!equalColors(colorFlashPlayer[3], Color BLACK))
 						setColor(4, colorFlashPlayer[3]);
+
 					colorFlashIsOff = false;
 				}
 			
@@ -627,7 +630,7 @@ void gameLoop() {
 					eventAnnounceTmr = 0;
 					//Start event
 					eventDelayTmr = millis();
-					eventDelay = EVENT_DURATION + 4500 + random(7000);
+					eventDelay = EVENT_DURATION + 9000 + random(11000);
 					eventTmr = millis();
 
 					//signalize that an event has started
@@ -659,6 +662,7 @@ void gameLoop() {
 								colorFlashDuration = 100;
 								colorFlashCount = 2;
 								colorFlashIsOff = false;
+
 								if (enabledPlayer[0]) {
 									setColor(1, colorFlashPlayer[0] = PlayerColor[i]);
 								}
@@ -711,6 +715,7 @@ void gameLoop() {
 						}
 					}
 				}
+
 
 				//handle Special Item Cooldown
 				if (playerSpecialCooldownTmr[i] != 0 && (unsigned long) (millis()-playerSpecialCooldownTmr[i]) >= ((gameSettings.chefMode&&currentChefIndex==i&&gameSettings.chefHasShorterCooldown)?(SPECIAL_COOLDOWN/3):SPECIAL_COOLDOWN) ) {
@@ -780,6 +785,8 @@ void gameLoop() {
 				setNoAnimation();
 				setAnimation(6, 25);
 				eventDelayTmr = 0;
+
+				digitalWrites(UVLEDs_OUTER,0,7,255);
 				
 			/*	eventDelayTmr = millis();
 				eventDelay = EVENT_DURATION + 4500 + random(7000);
@@ -874,8 +881,8 @@ void gameLoop() {
 
 				//50:50 chance of increase or decrease the speed
 				currentMotorSpeed += (random(2) == 0) ? (gameSettings.speedMinStepSize + random(gameSettings.speedMaxStepSize - gameSettings.speedMinStepSize + 1)) : -(gameSettings.speedMinStepSize + random(gameSettings.speedMaxStepSize - gameSettings.speedMinStepSize + 1));
-				if (currentMotorSpeed < MIN_MOTOR_SPEED+20) {
-					currentMotorSpeed = MIN_MOTOR_SPEED+20;
+				if (currentMotorSpeed < MIN_MOTOR_SPEED+20+gamePhase*10) {
+					currentMotorSpeed = MIN_MOTOR_SPEED+20+gamePhase*10;
 				}
 				if (currentMotorSpeed > MAX_MOTOR_SPEED - 50) {
 					currentMotorSpeed = MAX_MOTOR_SPEED - 50;
