@@ -657,7 +657,8 @@ void gameLoop() {
 						uint8_t cnt = getPlayerChipAmount(i + 1);
 						if (cnt != chipCount[i]) { // chip amount is still different -> has really changed
 							//update Chip Count
-							if (cnt < chipCount[i]) {
+							if (cnt < chipCount[i] && eventAnnouncePhase == -1 && eventTmr == 0) {
+								//only flash lights when no event is announcing 
 								colorFlashTmr = millis();
 								colorFlashDuration = 100;
 								colorFlashCount = 2;
