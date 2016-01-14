@@ -21,7 +21,7 @@ void setIdleAnimations() {
 void animationLEDsOff(int animationDBIndex) {
 	NewAnimation *anim;
 	anim = &AnimationDB[animationDBIndex];
-	if(anim->animType== COLOR_BACKWARD||anim->animType == COLOR_FORWARD||anim->animType==COLOR_ROTATE||anim->animType==COLOR_ROTATE_BACKWARDS||anim->animType==COLOR_BLINK){
+	if(anim->animType== COLOR_BACKWARD||anim->animType == COLOR_FORWARD||anim->animType==COLOR_ROTATE||anim->animType==COLOR_ROTATE_BACKWARDS||anim->animType==COLOR_BLINK||anim->animType==COLOR_BLINK_ALL){
 		setColor(1, Color BLACK);
 		setColor(2, Color BLACK);
 		setColor(3, Color BLACK);
@@ -282,6 +282,21 @@ void handleAnimationStep(NewAnimation &anim, AnimationTmr &animTmr, CurrentAnima
 			}
 		}
 		
+
+		oldIndex = -1;
+		newIndex = -1;
+		break;
+
+	case COLOR_BLINK_ALL:
+		colorMode = true;
+		animTmr.currentIndex++;
+		if (animTmr.currentIndex > (anim.endIndex - anim.startIndex)) {
+			animTmr.currentIndex = anim.startIndex;
+		}
+
+		for (int i = 1; i <= 4; i++) {
+			setColor(i, anim.pColorList[animTmr.currentIndex]);
+		}
 
 		oldIndex = -1;
 		newIndex = -1;

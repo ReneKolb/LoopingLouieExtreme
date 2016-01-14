@@ -295,7 +295,7 @@ void inline setRandomPhase2Animation() {
 }
 
 void inline setRandomPhase3Animation() {
-	switch (random(6)) {
+	switch (random(8)) {
 	case 0:
 		setAnimation(0, 10); // Circle 
 		setAnimation(1, 10, -1, 15); // Circle with offset  
@@ -355,6 +355,42 @@ void inline setRandomPhase3Animation() {
 		setAnimation(4, 5, 150);
 		setAnimation(5, 6, 100);
 		setAnimation(6, 31);
+		setAnimation(7, -1);
+		setAnimation(8, -1);
+		break;
+	case 6:
+		Log("anim 1");
+		setColor(1, Color BLACK);
+		setColor(2, Color BLACK);
+		setColor(3, Color BLACK);
+		setColor(4, Color BLACK);
+		digitalWrites(playerMiddleColors, 0, 19, 0);
+
+		setAnimation(0, 32);
+		setAnimation(1, -1);
+		setAnimation(2, -1);
+		setAnimation(3, -1);
+		setAnimation(4, -1);
+		setAnimation(5, -1);
+		setAnimation(6, -1);
+		setAnimation(7, -1);
+		setAnimation(8, -1);
+		break;
+	case 7:
+		Log("anim 2");
+		setColor(1, Color BLACK);
+		setColor(2, Color BLACK);
+		setColor(3, Color BLACK);
+		setColor(4, Color BLACK);
+		digitalWrites(playerMiddleColors, 0, 19, 0);
+
+		setAnimation(0, 33);
+		setAnimation(1, -1);
+		setAnimation(2, -1);
+		setAnimation(3, -1);
+		setAnimation(4, -1);
+		setAnimation(5, -1);
+		setAnimation(6, -1);
 		setAnimation(7, -1);
 		setAnimation(8, -1);
 		break;
