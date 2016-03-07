@@ -321,7 +321,7 @@ struct GameSettings{
 	uint16_t itemCooldownDelay; //individuell für jeden ItemTyp ?
 	bool alternateCooldownMode; //true: erst wenn alle spieler ein item eingesetzt haben, können die anderen wieder ein item einsetzen
 
-
+	bool enabledPlayers[4];
 };
 
 

@@ -168,6 +168,13 @@ SpecialItemType itemTypeFromChar(const char c) {
 	}
 }
 
+bool boolFromChar(const char c) {
+	if (c == '0')
+		return false;
+	else
+		return true;
+}
+
 void inline cmd_itemTypes() {
 	if (readSize == 4) {
 		gameSettings.itemType[0] = itemTypeFromChar(buffer[0]);
@@ -237,6 +244,19 @@ void inline cmd_requestChips() {
 	digitalWrite((PIN_ADDRESS)GLOBAL_IR, 0);
 }
 
+void inline cmd_setEnabledPlayers() {
+	if (readSize == 4) {
+		gameSettings.enabledPlayers[0] = boolFromChar(buffer[0]);
+		gameSettings.enabledPlayers[1] = boolFromChar(buffer[1]);
+		gameSettings.enabledPlayers[2] = boolFromChar(buffer[2]);
+		gameSettings.enabledPlayers[3] = boolFromChar(buffer[3]);
+		Log("Enabled Players updated");
+	}
+	else {
+		Log("Error: Wrong data size");
+	}
+}
+
 void fillBuffer(boolean usb) {
 	//first clear old buffer
 	memset(buffer, 0, sizeof(buffer));
@@ -245,7 +265,6 @@ void fillBuffer(boolean usb) {
 	}
 	else {
 		readSize = Serial1.readBytesUntil('.', buffer, 6);
-		Log("read"+(String)buffer);
 	}
 }
 
@@ -346,6 +365,10 @@ void handleSerialInput() {
 		case 's':
 			//start the game
 			initGame();
+			break;
+		case 't':
+			fillBuffer(usbAvailable);
+			cmd_setEnabledPlayers();
 			break;
 		case 'A':
 			pin = Serial.parseInt();

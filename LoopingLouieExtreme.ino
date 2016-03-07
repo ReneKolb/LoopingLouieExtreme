@@ -282,6 +282,11 @@ void loadDefaultGameSettings() {
 	gameSettings.itemAutoRefillDelay = 0; // 0: no refill
 	gameSettings.itemCooldownDelay = 5000; //individuell für jeden ItemTyp ?
 	gameSettings.alternateCooldownMode = false; //true: erst wenn alle spieler ein item eingesetzt haben, können die anderen wieder ein item einsetzen
+
+	gameSettings.enabledPlayers[0] = true;
+	gameSettings.enabledPlayers[1] = true;
+	gameSettings.enabledPlayers[2] = true;
+	gameSettings.enabledPlayers[3] = true;
 }
 
 void setup()

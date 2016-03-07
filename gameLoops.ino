@@ -10,8 +10,8 @@ enum GameState {
 #define TURBO_DURATION 300
 #define SLOW_DURATION 1000 // 500
 
-#define PHASE1_DURATION 13000
-#define PHASE2_DURATION 18000
+#define PHASE1_DURATION 18000
+#define PHASE2_DURATION 20000
 
 //Game Settings
 //boolean enableSpecialItems = true;
@@ -484,7 +484,7 @@ void initGame() {
 	delay(200);
 
 	playerCount = 0;
-	if (getPlayerChipAmount(1) == 3) {
+	if (gameSettings.enabledPlayers[0] && getPlayerChipAmount(1) == 3) {
 		Log("Player 1: OK");
 		enablePlayer(1);
 	}
@@ -493,7 +493,7 @@ void initGame() {
 		enabledPlayer[0] = false;
 	}
 
-	if (getPlayerChipAmount(2) == 3) {
+	if (gameSettings.enabledPlayers[1] && getPlayerChipAmount(2) == 3) {
 		Log("Player 2: OK");
 		enablePlayer(2);
 	}
@@ -502,7 +502,7 @@ void initGame() {
 		enabledPlayer[1] = false;
 	}
 
-	if (getPlayerChipAmount(3) == 3) {
+	if (gameSettings.enabledPlayers[2] && getPlayerChipAmount(3) == 3) {
 		Log("Player 3: OK");
 		enablePlayer(3);
 	}
@@ -511,7 +511,7 @@ void initGame() {
 		enabledPlayer[2] = false;
 	}
 
-	if (getPlayerChipAmount(4) == 3) {
+	if (gameSettings.enabledPlayers[3] && getPlayerChipAmount(4) == 3) {
 		Log("Player 4: OK");
 		enablePlayer(4);
 	}
