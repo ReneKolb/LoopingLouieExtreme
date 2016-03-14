@@ -9,6 +9,7 @@ enum GameState {
 #define SPECIAL_COOLDOWN 5000
 #define TURBO_DURATION 300
 #define SLOW_DURATION 1000 // 500
+#define BLACKOUT_DURATION 1500
 
 #define PHASE1_DURATION 18000
 #define PHASE2_DURATION 20000
@@ -41,6 +42,7 @@ uint8_t playerSpecialItemAmount[4];
 
 unsigned long turboTmr;
 unsigned long slowTmr;
+unsigned long blackoutTmr;
 
 unsigned long recheckTmr[4];
 
@@ -113,6 +115,17 @@ void handleDirectionChange() {
 	setMotorSpeed(currentMotorDirection, currentMotorSpeed);
 }
 
+void handleBlackout() {
+	blackoutTmr = millis();
+	fullOff(false, false);
+	/*
+	digitalWrites(playerMiddleColors,0,19,0);
+	digitalWrites(playerCircle,0,31,0);
+	digitalWrites(UVLEDs,0,15,0);
+	digitalWrites(RGB_LEDS, 0, 11, 0);
+	*/
+}
+
 void handleSpecialButton(uint8_t player) {
 	if (playerSpecialCooldownTmr[player - 1] == 0) {
 		//no Cooldown
@@ -121,18 +134,6 @@ void handleSpecialButton(uint8_t player) {
 			playerSpecialCooldownTmr[player - 1] = millis();
 			updatePlayerBoosterLEDs(player, playerSpecialItemAmount[player - 1],false);
 			digitalWrite(SpecialButtonLED[player - 1], 0);
-
-			colorFlashTmr = millis();
-			colorFlashDuration = 150;
-			colorFlashCount = 2;
-			colorFlashIsOff = false;
-			setColor(player, colorFlashPlayer[player-1] = BLUE);
-			for (int i = 0; i < 4; i++) {
-				if (i != player - 1) {
-					colorFlashPlayer[i] = BLACK;
-				}
-			}
-
 			
 			switch (gameSettings.itemType[player - 1]) {
 			case TURBO:
@@ -144,6 +145,22 @@ void handleSpecialButton(uint8_t player) {
 			case CHANGE_DIR:
 				handleDirectionChange();
 				break;
+			case BLACKOUT:
+				handleBlackout();
+				break;
+			}
+
+			if (blackoutTmr == 0) {
+				colorFlashTmr = millis();
+				colorFlashDuration = 150;
+				colorFlashCount = 2;
+				colorFlashIsOff = false;
+				setColor(player, colorFlashPlayer[player - 1] = BLUE);
+				for (int i = 0; i < 4; i++) {
+					if (i != player - 1) {
+						colorFlashPlayer[i] = BLACK;
+					}
+				}
 			}
 		}
 	}
@@ -468,6 +485,7 @@ void initGame() {
 
 	turboTmr = 0;
 	slowTmr = 0;
+	blackoutTmr = 0;
 
 	eventDelayTmr = 0;
 	eventDelay = 12000 + random(5000);
@@ -585,7 +603,7 @@ void gameLoop() {
 		break;
 	case RUNNING:
 		//if(doAnimations)
-		if (eventTmr == 0) {
+		if (eventTmr == 0 && blackoutTmr == 0) {
 			//TODO: Bedingung allgemeiner! aber zum Testen hier speziell
 			handleAnimations();
 		}
@@ -619,6 +637,12 @@ void gameLoop() {
 			}
 		}
 
+		if (blackoutTmr != 0) {
+			if ((unsigned long)(millis() - blackoutTmr) > BLACKOUT_DURATION) {
+				blackoutTmr = 0;
+			}
+		}
+
 		if (colorFlashTmr != 0) {
 			if ((unsigned long)(millis() - colorFlashTmr) > colorFlashDuration) {
 				if (!colorFlashIsOff) {
@@ -642,16 +666,16 @@ void gameLoop() {
 					colorFlashIsOff = true;
 				}else{
 					colorFlashTmr = millis();
-
-					if (!equalColors(colorFlashPlayer[0], Color BLACK))
-						setColor(1, colorFlashPlayer[0]);
-					if (!equalColors(colorFlashPlayer[1], Color BLACK))
-						setColor(2, colorFlashPlayer[1]);
-					if (!equalColors(colorFlashPlayer[2], Color BLACK))
-						setColor(3, colorFlashPlayer[2]);
-					if (!equalColors(colorFlashPlayer[3], Color BLACK))
-						setColor(4, colorFlashPlayer[3]);
-
+					if (blackoutTmr == 0) {
+						if (!equalColors(colorFlashPlayer[0], Color BLACK))
+							setColor(1, colorFlashPlayer[0]);
+						if (!equalColors(colorFlashPlayer[1], Color BLACK))
+							setColor(2, colorFlashPlayer[1]);
+						if (!equalColors(colorFlashPlayer[2], Color BLACK))
+							setColor(3, colorFlashPlayer[2]);
+						if (!equalColors(colorFlashPlayer[3], Color BLACK))
+							setColor(4, colorFlashPlayer[3]);
+					}
 					colorFlashIsOff = false;
 				}
 			

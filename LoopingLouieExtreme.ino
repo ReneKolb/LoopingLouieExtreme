@@ -277,7 +277,7 @@ void loadDefaultGameSettings() {
 	gameSettings.itemType[0] = TURBO;
 	gameSettings.itemType[1] = SLOW;
 	gameSettings.itemType[2] = CHANGE_DIR;
-	gameSettings.itemType[3] = SLOW;
+	gameSettings.itemType[3] = BLACKOUT;
 
 	gameSettings.itemAutoRefillDelay = 0; // 0: no refill
 	gameSettings.itemCooldownDelay = 5000; //individuell für jeden ItemTyp ?
