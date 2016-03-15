@@ -8,9 +8,10 @@ size_t readSize;
 
 void inline cmd_randomSpeed() {
 	if (readSize == 1) {
-		gameSettings.randomSpeed = atoi(buffer)!=0;
-		Log("New Random Speed: "+(String)gameSettings.randomSpeed);
-	}else{
+		gameSettings.randomSpeed = atoi(buffer) != 0;
+		Log("New Random Speed: " + (String)gameSettings.randomSpeed);
+	}
+	else {
 		Log("Error: Wrong data size");
 	}
 }
@@ -18,10 +19,11 @@ void inline cmd_randomSpeed() {
 void inline cmd_startSpeed() {
 	int n = atoi(buffer);
 	if (n < MIN_MOTOR_SPEED) {
-		Log("start Speed "+(String)n+" is smaller than "+(String)MIN_MOTOR_SPEED+". It is fitted!");
+		Log("start Speed " + (String)n + " is smaller than " + (String)MIN_MOTOR_SPEED + ". It is fitted!");
 		n = MIN_MOTOR_SPEED;
-	} else if (n>MAX_MOTOR_SPEED) {
-		Log("start Speed "+(String)n+" is larger than "+(String)MAX_MOTOR_SPEED+". It is fitted!");
+	}
+	else if (n>MAX_MOTOR_SPEED) {
+		Log("start Speed " + (String)n + " is larger than " + (String)MAX_MOTOR_SPEED + ". It is fitted!");
 		n = MAX_MOTOR_SPEED;
 	}
 	gameSettings.startSpeed = n;
@@ -53,7 +55,7 @@ void inline cmd_speedMaxDelay() {
 		n = 60000;
 	}
 	if (n < gameSettings.speedMinDelay) {
-		Log("Speed Max Delay " + (String)n + " is smaller than Speed Min Delay("+(String)gameSettings.speedMinDelay+"). It is fitted!");
+		Log("Speed Max Delay " + (String)n + " is smaller than Speed Min Delay(" + (String)gameSettings.speedMinDelay + "). It is fitted!");
 		n = gameSettings.speedMinDelay;
 	}
 	gameSettings.speedMaxDelay = n;
@@ -132,7 +134,7 @@ void inline cmd_chefChangeDelay() {
 		Log("Chef Change Delay " + (String)n + " is larger than 60000. It is fitted!");
 		n = 60000;
 	}
-	
+
 	gameSettings.chefChangeDelay = n;
 	Log("new Chef Change Delay: " + (String)gameSettings.chefChangeDelay);
 }
@@ -160,11 +162,15 @@ void inline cmd_enableItems() {
 SpecialItemType itemTypeFromChar(const char c) {
 	if (c == '0') {
 		return TURBO;
-	}else if (c == '1'){
+	}
+	else if (c == '1') {
 		return SLOW;
 	}
-	else {
+	else if (c == '2') {
 		return CHANGE_DIR;
+	}
+	else {
+		return BLACKOUT;
 	}
 }
 
@@ -182,7 +188,8 @@ void inline cmd_itemTypes() {
 		gameSettings.itemType[2] = itemTypeFromChar(buffer[2]);
 		gameSettings.itemType[3] = itemTypeFromChar(buffer[3]);
 		Log("Item Types updated");
-	} else {
+	}
+	else {
 		Log("Error: Wrong data size");
 	}
 }
@@ -240,7 +247,7 @@ void inline cmd_alternateCD() {
 void inline cmd_requestChips() {
 	digitalWrite((PIN_ADDRESS)GLOBAL_IR, 255);
 	delay(15);
-	Serial1.print("d"+ (String)getPlayerChipAmount(1)+ (String)getPlayerChipAmount(2)+ (String)getPlayerChipAmount(3)+ (String)getPlayerChipAmount(4) +".");
+	Serial1.print("d" + (String)getPlayerChipAmount(1) + (String)getPlayerChipAmount(2) + (String)getPlayerChipAmount(3) + (String)getPlayerChipAmount(4) + ".");
 	digitalWrite((PIN_ADDRESS)GLOBAL_IR, 0);
 }
 
@@ -280,7 +287,7 @@ int pin;
 void handleSerialInput() {
 	usbAvailable = Serial.available();
 	btAvailable = Serial1.available();
-	if (usbAvailable||btAvailable) {
+	if (usbAvailable || btAvailable) {
 		//first char is action type
 		if (usbAvailable) {
 			actionByte = Serial.read();
@@ -383,7 +390,7 @@ void handleSerialInput() {
 			Log("IR off");
 			break;
 		case 'D':
-	//		pin = Serial.parseInt(); //player
+			//		pin = Serial.parseInt(); //player
 			Serial.println("IR-Status:");
 			Serial.println((String)analogRead(A3) + "\t" + (String)analogRead(A4) + "\t" + (String)analogRead(A5));
 			Serial.println((String)analogRead(A6) + "\t" + (String)analogRead(A7) + "\t" + (String)analogRead(A8));
@@ -394,7 +401,7 @@ void handleSerialInput() {
 			//'.' is the command end symbol. So a actionByte with '.' is no command. --> Ignore
 			break;
 		default:
-			Log("Unkown Action Byte: "+(String)actionByte);
+			Log("Unkown Action Byte: " + (String)actionByte);
 		}
 	}
 }
