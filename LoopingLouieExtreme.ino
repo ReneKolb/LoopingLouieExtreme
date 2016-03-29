@@ -382,6 +382,11 @@ void loop()
 			}
 			else if ((unsigned long)(millis() - pressStartTmr)>PRESS_START_DELAY) {
 				pressStartTmr = 0;
+				gameSettings.enabledPlayers[0] = true;
+				gameSettings.enabledPlayers[1] = true;
+				gameSettings.enabledPlayers[2] = true;
+				gameSettings.enabledPlayers[3] = true;
+
 				initGame();
 			}
 		}else{
