@@ -30,6 +30,34 @@ void inline cmd_startSpeed() {
 	Log("new Start Speed: " + (String)gameSettings.startSpeed);
 }
 
+void inline cmd_speedMin() {
+	int n = atoi(buffer);
+	if (n < MIN_MOTOR_SPEED) {
+		Log("Speed Min " + (String)n + " is smaller than 0. It is fitted!");
+		n = MIN_MOTOR_SPEED;
+	}
+	else if (n > MAX_MOTOR_SPEED) {
+		Log("Speed Min " + (String)n + " is larger than 60000. It is fitted!");
+		n = MAX_MOTOR_SPEED;
+	}
+	gameSettings.minSpeed = n;
+	Log("new Speed Min: " + (String)gameSettings.minSpeed);
+}
+
+void inline cmd_speedMax() {
+	int n = atoi(buffer);
+	if (n < MIN_MOTOR_SPEED) {
+		Log("Speed Max " + (String)n + " is smaller than 0. It is fitted!");
+		n = MIN_MOTOR_SPEED;
+	}
+	else if (n > MAX_MOTOR_SPEED) {
+		Log("Speed Max " + (String)n + " is larger than 60000. It is fitted!");
+		n = MAX_MOTOR_SPEED;
+	}
+	gameSettings.maxSpeed = n;
+	Log("new Speed Max: " + (String)gameSettings.maxSpeed);
+}
+
 void inline cmd_speedMinDelay() {
 	int n = atoi(buffer);
 	if (n < 0) {
@@ -376,6 +404,14 @@ void handleSerialInput() {
 		case 't':
 			fillBuffer(usbAvailable);
 			cmd_setEnabledPlayers();
+			break;
+		case 'u':
+			fillBuffer(usbAvailable);
+			cmd_speedMin();
+			break;
+		case 'v':
+			fillBuffer(usbAvailable);
+			cmd_speedMax();
 			break;
 		case 'A':
 			pin = Serial.parseInt();

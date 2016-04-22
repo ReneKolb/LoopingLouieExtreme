@@ -301,6 +301,8 @@ struct GameSettings{
 	//Speed Settings
 	bool randomSpeed;
 	uint8_t startSpeed;
+	int minSpeed;
+	int maxSpeed;
 	int speedMinDelay; //0 means: delay between speed steps is always the same
 	int speedMaxDelay;
 	int speedMinStepSize;
