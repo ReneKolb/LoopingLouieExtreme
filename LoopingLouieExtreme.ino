@@ -259,6 +259,8 @@ void loadDefaultGameSettings() {
 	//Speed Settings
 	gameSettings.randomSpeed = true;
 	gameSettings.startSpeed = NORMAL_MOTOR_SPEED;
+	gameSettings.minSpeed = 49;
+	gameSettings.maxSpeed = 120;
 	gameSettings.speedMinDelay = 5000; //0 means: delay between speed steps is always the same
 	gameSettings.speedMaxDelay = 12000;
 	gameSettings.speedMinStepSize = 7;

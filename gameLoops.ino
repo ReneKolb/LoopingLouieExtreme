@@ -952,7 +952,7 @@ void gameLoop() {
 					currentMotorSpeed = MAX_MOTOR_SPEED - 50;
 				}
 				if (currentMotorSpeed > gameSettings.maxSpeed) {
-					currentMotorSpeed = min(MIN_MOTOR_SPEED, gameSettings.maxSpeed);
+					currentMotorSpeed = min(MAX_MOTOR_SPEED, gameSettings.maxSpeed);
 				}
 
 			//	setAnimationDelay(0,calcAnimationDelay(currentMotorSpeed));
