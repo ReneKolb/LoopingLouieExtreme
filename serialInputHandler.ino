@@ -12,7 +12,7 @@ void inline cmd_randomSpeed() {
 		Log("New Random Speed: " + (String)gameSettings.randomSpeed);
 	}
 	else {
-		Log("Error: Wrong data size");
+		Log("Error: Wrong data size in randomSpeed");
 	}
 }
 
@@ -128,7 +128,7 @@ void inline cmd_enableReverse() {
 		Log("New Enable Reverse: " + (String)gameSettings.enableReverse);
 	}
 	else {
-		Log("Error: Wrong data size");
+		Log("Error: Wrong data size in enableReverse");
 	}
 }
 
@@ -138,7 +138,7 @@ void inline cmd_chefMode() {
 		Log("New Chef Mode: " + (String)gameSettings.chefMode);
 	}
 	else {
-		Log("Error: Wrong data size");
+		Log("Error: Wrong data size in chefMode");
 	}
 }
 
@@ -148,7 +148,7 @@ void inline cmd_chefRoulette() {
 		Log("New Chef Roulette: " + (String)gameSettings.chefRoulette);
 	}
 	else {
-		Log("Error: Wrong data size");
+		Log("Error: Wrong data size in chefRoulette");
 	}
 }
 
@@ -173,7 +173,7 @@ void inline cmd_chefShorterCD() {
 		Log("New Chef Shorter CD: " + (String)gameSettings.chefHasShorterCooldown);
 	}
 	else {
-		Log("Error: Wrong data size");
+		Log("Error: Wrong data size in chefShorterCD");
 	}
 }
 
@@ -183,7 +183,7 @@ void inline cmd_enableItems() {
 		Log("New Enable Items: " + (String)gameSettings.enableItems);
 	}
 	else {
-		Log("Error: Wrong data size");
+		Log("Error: Wrong data size in enableItems");
 	}
 }
 
@@ -218,7 +218,7 @@ void inline cmd_itemTypes() {
 		Log("Item Types updated");
 	}
 	else {
-		Log("Error: Wrong data size");
+		Log("Error: Wrong data size in itemTypes");
 	}
 }
 
@@ -228,7 +228,7 @@ void inline cmd_enableEvents() {
 		Log("New Enable Events: " + (String)gameSettings.enableEvents);
 	}
 	else {
-		Log("Error: Wrong data size");
+		Log("Error: Wrong data size in enableEvents");
 	}
 }
 
@@ -268,14 +268,14 @@ void inline cmd_alternateCD() {
 		Log("New Alternate CD: " + (String)gameSettings.alternateCooldownMode);
 	}
 	else {
-		Log("Error: Wrong data size");
+		Log("Error: Wrong data size in alternateCD");
 	}
 }
 
 void inline cmd_requestChips() {
 	digitalWrite((PIN_ADDRESS)GLOBAL_IR, 255);
 	delay(15);
-	Serial1.print("d" + (String)getPlayerChipAmount(1) + (String)getPlayerChipAmount(2) + (String)getPlayerChipAmount(3) + (String)getPlayerChipAmount(4) + ".");
+	BTprint("d" + (String)getPlayerChipAmount(1) + (String)getPlayerChipAmount(2) + (String)getPlayerChipAmount(3) + (String)getPlayerChipAmount(4) + ".");
 	digitalWrite((PIN_ADDRESS)GLOBAL_IR, 0);
 }
 
@@ -288,7 +288,7 @@ void inline cmd_setEnabledPlayers() {
 		Log("Enabled Players updated");
 	}
 	else {
-		Log("Error: Wrong data size");
+		Log("Error: Wrong data size in setEnabledPlayers");
 	}
 }
 
@@ -301,6 +301,7 @@ void fillBuffer(boolean usb) {
 	else {
 		readSize = Serial1.readBytesUntil('.', buffer, 6);
 	}
+	Log("read: " + (String)buffer);
 }
 
 //DEBUG
@@ -319,11 +320,13 @@ void handleSerialInput() {
 		//first char is action type
 		if (usbAvailable) {
 			actionByte = Serial.read();
+			Log("Read action Byte USB: " + (String)actionByte +" = "+ (char)actionByte);
 		}
 		else {
 			actionByte = Serial1.read();
+			Log("Read action Byte BT: " + (String)actionByte+ " = "+(char)actionByte);
 		}
-
+		
 		switch (actionByte) {
 		case 'a':
 			fillBuffer(usbAvailable);

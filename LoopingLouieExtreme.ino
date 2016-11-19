@@ -291,6 +291,10 @@ void loadDefaultGameSettings() {
 	gameSettings.enabledPlayers[3] = true;
 }
 
+void inline BTprint(String message) {
+	Serial1.print(message);
+}
+
 void setup()
 {
 	if (DEBUG) {

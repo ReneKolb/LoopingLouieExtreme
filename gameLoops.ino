@@ -540,14 +540,14 @@ void initGame() {
 
 	if (playerCount <= 1) {
 		Log("Cannot start. Too few Players available (" +(String)playerCount+")");
-		Serial1.print("b"+(String)playerCount+".");
+		BTprint("b"+(String)playerCount+".");
 		state = IDLE;
 		setIdleAnimations();
 		return;
 		//gameState = COUNTDOWN;
 	}
 	else {
-		Serial1.print("c.");
+		BTprint("c.");
 	}
 
 	if (gameSettings.chefMode) {
@@ -925,16 +925,16 @@ void gameLoop() {
 				motorSpeedChangeTmr = millis();
 				motorSpeedChangeDelay = gameSettings.speedMinDelay + random(gameSettings.speedMaxDelay-gameSettings.speedMinDelay+1);
 
-				if (gameSettings.enableReverse) {
-					if (!currentMotorDirection) {
-						currentMotorDirection = true; //change from backward to forward
-					}
-					else {
-						if (random(4) == 0) {
-							//25% chance of turing backward
+				if (!currentMotorDirection) {
+					currentMotorDirection = true; //change from backward to forward
+				}
+				else {
+					if (gameSettings.enableReverse) {
+						if (random(10) == 0) {
+							//10% chance of turing backward
 							currentMotorDirection = false;
-							if (currentMotorSpeed > 100) {
-								currentMotorSpeed = 100; //limit initial backward speed to 100
+							if (currentMotorSpeed > 110) {
+								currentMotorSpeed = 110; //limit initial backward speed to 100
 							}
 						}
 					}
@@ -1012,5 +1012,5 @@ void endGame() {
 	//play end/win effect
 	digitalWrite(PIN_ADDRESS GLOBAL_IR, LOW);
 	setMotorSpeed(true,0);
-	Serial1.print("a"+(String)score[3]+":" + (String)score[2] + ":" + (String)score[1] + ":" + (String)score[0] +".");
+	BTprint("a"+(String)score[3]+":" + (String)score[2] + ":" + (String)score[1] + ":" + (String)score[0] +".");
 }
