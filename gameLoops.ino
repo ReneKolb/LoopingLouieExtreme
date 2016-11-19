@@ -720,8 +720,8 @@ void gameLoop() {
 							if (cnt < chipCount[i] && eventAnnouncePhase == -1 && eventTmr == 0) {
 								//only flash lights when no event is announcing 
 								colorFlashTmr = millis();
-								colorFlashDuration = 100;
-								colorFlashCount = 2;
+								colorFlashDuration = 50;
+								colorFlashCount = 5;
 								colorFlashIsOff = false;
 
 								if (enabledPlayer[0]) {
