@@ -6,15 +6,15 @@ void setIdleAnimations() {
 	for (int i = 0; i < 10; i++) {
 		animationTimers[i] = { 0,-1 };
 	}
-	currentAnimations[0] = { 0,-1, DEFAULT_ANIM };
-	currentAnimations[1] = { 1,-1, DEFAULT_ANIM };
-	currentAnimations[2] = { 2,-1, DEFAULT_ANIM };
-	currentAnimations[3] = { 3,-1, DEFAULT_ANIM };
-	currentAnimations[4] = { 5,-1, DEFAULT_ANIM };
-	currentAnimations[5] = { 6,-1, DEFAULT_ANIM };
-	currentAnimations[6] = { 7,-1, DEFAULT_ANIM };
-	currentAnimations[7] = { 9,-1, DEFAULT_ANIM };
-	currentAnimations[8] = { 16,-1, DEFAULT_ANIM };
+	currentAnimations[0] = { 0, 200, DEFAULT_ANIM };
+	currentAnimations[1] = { 1, 200, DEFAULT_ANIM };
+	currentAnimations[2] = { 2, 200, DEFAULT_ANIM };
+	currentAnimations[3] = { 3, 200, DEFAULT_ANIM };
+	currentAnimations[4] = { 5,1500, DEFAULT_ANIM };
+	currentAnimations[5] = { 6, 640, DEFAULT_ANIM };
+	currentAnimations[6] = { 7, 320, DEFAULT_ANIM };
+	currentAnimations[7] = { 9,  34, DEFAULT_ANIM };
+	currentAnimations[8] = { 16, 48, DEFAULT_ANIM };
 	currentAnimations[9] = { -1,-1, DEFAULT_ANIM };
 }
 

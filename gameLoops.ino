@@ -4,15 +4,14 @@ enum GameState {
 	OUTRO
 };
 
+#define SPECIAL_COOLDOWN 5000UL
+#define TURBO_DURATION 300UL
+#define SLOW_DURATION 1000UL // 500
+#define BLACKOUT_DURATION 1500UL
 
-
-#define SPECIAL_COOLDOWN 5000
-#define TURBO_DURATION 300
-#define SLOW_DURATION 1000 // 500
-#define BLACKOUT_DURATION 1500
-
-#define PHASE1_DURATION 18000
-#define PHASE2_DURATION 20000
+#define PHASE1_DURATION 18000UL
+#define PHASE2_DURATION 20000UL
+#define PHASE3_DURATION 22000UL
 
 //Game Settings
 //boolean enableSpecialItems = true;
@@ -31,13 +30,14 @@ uint8_t animationStep;
 unsigned long eventDelayTmr;
 uint16_t eventDelay;
 unsigned long eventTmr;
-#define EVENT_DURATION 1500
+#define EVENT_DURATION 1500UL
 
 unsigned long eventAnnounceTmr;
 int eventAnnouncePhase;
 
 unsigned long playerSpecialCooldownTmr[4];
 uint8_t playerSpecialItemAmount[4];
+boolean reverse_available; // is true when any player has a reverse item otherwise false
 //SpecialItemType playerSpecialItemType[4];
 
 unsigned long turboTmr;
@@ -59,6 +59,8 @@ uint16_t motorSpeedChangeDelay;
 unsigned long animationSwitchTmr;
 unsigned long animationSwitchDelay;
 
+uint8_t  deathPhaseIndex = 0;
+
 unsigned long colorFlashTmr; //used for short light flashes (e.g. loose a chip, display item usage)
 Color colorFlashPlayer[4];
 uint8_t colorFlashDuration;
@@ -66,6 +68,7 @@ uint8_t colorFlashCount;
 boolean colorFlashIsOff;
 
 unsigned long startTime;
+unsigned long dStartTime;
 uint8_t gamePhase;
 
 //uint8_t loser;
@@ -128,7 +131,7 @@ void handleBlackout() {
 
 void handleSpecialButton(uint8_t player) {
 	if (playerSpecialCooldownTmr[player - 1] == 0) {
-		//no Cooldown
+		//player has no Cooldown, so go on
 		if (playerSpecialItemAmount[player - 1] >= 1) {
 			playerSpecialItemAmount[player - 1]--;
 			playerSpecialCooldownTmr[player - 1] = millis();
@@ -416,19 +419,57 @@ void inline setRandomPhase3Animation() {
 
 void setRandomGameAnim() {
 	Serial.println("GamePhase: "+(String)gamePhase);
-	switch (gamePhase) {
-	case 0:
-		//chill phase
-		setRandomPhase1Animation();
-		break;
-	case 1:
-		//normal phase
-		setRandomPhase2Animation();
-		break;
-	case 2:
-		//escalation phase ----> PARTY!!!
-		setRandomPhase3Animation();
-		break;
+	if (gameSettings.no_anim_mode) {
+		setAnimation(0, -1);
+		setAnimation(1, -1);
+		setAnimation(2, -1);
+		setAnimation(3, -1);
+		setAnimation(4, -1);
+		setAnimation(5, -1);
+		setAnimation(6, -1);
+		setAnimation(7, -1);
+		setAnimation(8, -1);
+
+		digitalWrites(UVLEDs,0,15,255);
+		if (gameSettings.enabledPlayers[0])
+			setColor(1, PlayerColor[0]);
+		if (gameSettings.enabledPlayers[1])
+			setColor(2, PlayerColor[1]);
+		if (gameSettings.enabledPlayers[2])
+			setColor(3, PlayerColor[2]);
+		if (gameSettings.enabledPlayers[3])
+			setColor(4, PlayerColor[3]);
+	}
+	else {
+		switch (gamePhase) {
+		case 0:
+			//chill phase
+			setRandomPhase1Animation();
+			break;
+		case 1:
+			//normal phase
+			setRandomPhase2Animation();
+			break;
+		case 2:
+			//escalation phase ----> PARTY!!!
+			setRandomPhase3Animation();
+			break;
+		case 3:
+			//DEATH phase ---> blink to death
+			deathPhaseIndex++;
+			if (deathPhaseIndex > 10) deathPhaseIndex = 10;
+
+			setAnimation(0, 35, 550 - deathPhaseIndex * 50); // Circle 
+			setAnimation(1,-1); 
+			setAnimation(2, 34, 550 - deathPhaseIndex * 50); // Middle Start
+			setAnimation(3, -1); 
+			setAnimation(4, 4, 550- deathPhaseIndex*50); // UVLED OUTER BLINK
+			setAnimation(5, -1); 
+			setAnimation(6, 31, 550 - deathPhaseIndex * 50); //COLOR
+			setAnimation(7, -1); 
+			setAnimation(8, -1); 
+			break;
+		}
 	}
 }
 
@@ -472,6 +513,9 @@ void initGame() {
 	playerSpecialItemAmount[2] = 4;
 	playerSpecialItemAmount[3] = 4;
 
+	reverse_available = false;
+	deathPhaseIndex = 0;
+
 	score[0] = 255;
 	score[1] = 255;
 	score[2] = 255;
@@ -505,6 +549,7 @@ void initGame() {
 	if (gameSettings.enabledPlayers[0] && getPlayerChipAmount(1) == 3) {
 		Log("Player 1: OK");
 		enablePlayer(1);
+		reverse_available |= gameSettings.itemType[0] == CHANGE_DIR;
 	}
 	else {
 		Log("Player 1: -");
@@ -514,6 +559,7 @@ void initGame() {
 	if (gameSettings.enabledPlayers[1] && getPlayerChipAmount(2) == 3) {
 		Log("Player 2: OK");
 		enablePlayer(2);
+		reverse_available |= gameSettings.itemType[1] == CHANGE_DIR;
 	}
 	else {
 		Log("Player 2: -");
@@ -523,6 +569,7 @@ void initGame() {
 	if (gameSettings.enabledPlayers[2] && getPlayerChipAmount(3) == 3) {
 		Log("Player 3: OK");
 		enablePlayer(3);
+		reverse_available |= gameSettings.itemType[2] == CHANGE_DIR;
 	}
 	else {
 		Log("Player 3: -");
@@ -532,6 +579,7 @@ void initGame() {
 	if (gameSettings.enabledPlayers[3] && getPlayerChipAmount(4) == 3) {
 		Log("Player 4: OK");
 		enablePlayer(4);
+		reverse_available |= gameSettings.itemType[4] == CHANGE_DIR;
 	}
 	else {
 		Log("Player 4: -");
@@ -604,7 +652,7 @@ void gameLoop() {
 	case RUNNING:
 		//if(doAnimations)
 		if (eventTmr == 0 && blackoutTmr == 0) {
-			//TODO: Bedingung allgemeiner! aber zum Testen hier speziell
+			//TODO: Bedingung allgemeiner! aber zum Testen hier speziell (eventTmr...)
 			handleAnimations();
 		}
 
@@ -614,13 +662,21 @@ void gameLoop() {
 			setRandomGameAnim();
 		}
 
-		if ((unsigned long)(millis() - startTime) > PHASE1_DURATION) {
-			if ((unsigned long)(millis() - startTime) > (PHASE1_DURATION + PHASE2_DURATION)) {
-				gamePhase = 2;
-			}
-			else {
-				gamePhase = 1;
-			}
+		dStartTime = (unsigned long)(millis() - startTime);
+		if (dStartTime > (PHASE1_DURATION + PHASE2_DURATION + PHASE3_DURATION)) {
+			if(gamePhase != 3)
+				Log("Phase 3");
+			gamePhase = 3;
+		}
+		else if (dStartTime > (PHASE1_DURATION + PHASE2_DURATION)) {
+			if (gamePhase != 2)
+				Log("Phase 2");
+			gamePhase = 2;
+		}
+		else if(dStartTime > PHASE1_DURATION) {
+			if(gamePhase !=1 )
+				Log("Phase 1");
+			gamePhase = 1;
 		}
 
 		if (turboTmr != 0) {
@@ -717,8 +773,8 @@ void gameLoop() {
 						uint8_t cnt = getPlayerChipAmount(i + 1);
 						if (cnt != chipCount[i]) { // chip amount is still different -> has really changed
 							//update Chip Count
-							if (cnt < chipCount[i] && eventAnnouncePhase == -1 && eventTmr == 0) {
-								//only flash lights when no event is announcing 
+							if (!gameSettings.no_anim_mode&&cnt < chipCount[i] && eventAnnouncePhase == -1 && eventTmr == 0) {
+								//only flash lights when no event is announcing  AND when animations are enabled
 								colorFlashTmr = millis();
 								colorFlashDuration = 50;
 								colorFlashCount = 5;
@@ -753,7 +809,7 @@ void gameLoop() {
 								}
 								setColor(i + 1, Color BLACK);
 								updatePlayerBoosterLEDs(i+1,0);
-								//digitalWrite(SpecialButtonLED[i],0);
+								digitalWrite(SpecialButtonLED[i],0);
 
 								playerCount--;
 								//TODO: play "player lose" effect
@@ -781,6 +837,9 @@ void gameLoop() {
 				//handle Special Item Cooldown
 				if (playerSpecialCooldownTmr[i] != 0 && (unsigned long) (millis()-playerSpecialCooldownTmr[i]) >= ((gameSettings.chefMode&&currentChefIndex==i&&gameSettings.chefHasShorterCooldown)?(SPECIAL_COOLDOWN/3):SPECIAL_COOLDOWN) ) {
 					playerSpecialCooldownTmr[i] = 0;
+					if (gameSettings.enabledPlayers[i]) {
+						setColor(i + 1, PlayerColor[i]);
+					}
 					if (playerSpecialItemAmount[i] > 0) {
 						//nur rote LED anschalten, wenn noch Items übrig sind
 						digitalWrite(SpecialButtonLED[i], 255);
@@ -879,20 +938,20 @@ void gameLoop() {
 						if (enabledPlayer[i - 1] && checkButtons(i)) {
 							//end event -> an enabled! player has pressed a button
 							eventTmr = 0;
-							playerSpecialItemAmount[i - 1]++;
+							playerSpecialItemAmount[i - 1] = 4; //complete refill items
 							//play Effect
-							if (playerSpecialItemAmount[i - 1] > 4) {
-								playerSpecialItemAmount[i - 1] = 4;
-							}
-							else {
-								updatePlayerBoosterLEDs(i, playerSpecialItemAmount[i - 1]);
-							}
+//							if (playerSpecialItemAmount[i - 1] > 4) {
+//								playerSpecialItemAmount[i - 1] = 4;
+//							}
+//							else {
+							updatePlayerBoosterLEDs(i, playerSpecialItemAmount[i - 1]);
+//							}
 
 							colorFlashTmr = millis();
 							colorFlashDuration = 100;
 							colorFlashCount = 3;
 							colorFlashIsOff = false;
-							setColor(1, (colorFlashPlayer[0] = PlayerColor[i-1]));
+							setColor(1, (colorFlashPlayer[0] = PlayerColor[i - 1]));
 							setColor(2, (colorFlashPlayer[1] = PlayerColor[i - 1]));
 							setColor(3, (colorFlashPlayer[2] = PlayerColor[i - 1]));
 							setColor(4, (colorFlashPlayer[3] = PlayerColor[i - 1]));
@@ -930,18 +989,24 @@ void gameLoop() {
 				}
 				else {
 					if (gameSettings.enableReverse) {
-						if (random(10) == 0) {
-							//10% chance of turing backward
+						if ((reverse_available && random(9) == 0 )||(!reverse_available && random(5)==0)) {
+							//11% chance of turing backward when no player has reverse item,
+							//20% chance when any player has reverse item
 							currentMotorDirection = false;
 							if (currentMotorSpeed > 110) {
-								currentMotorSpeed = 110; //limit initial backward speed to 100
+								currentMotorSpeed = 110; //limit initial backward speed to <=110
 							}
 						}
 					}
 				}
 
 				//50:50 chance of increase or decrease the speed
-				currentMotorSpeed += (random(2) == 0) ? (gameSettings.speedMinStepSize + random(gameSettings.speedMaxStepSize - gameSettings.speedMinStepSize + 1)) : -(gameSettings.speedMinStepSize + random(gameSettings.speedMaxStepSize - gameSettings.speedMinStepSize + 1));
+				if (random(2) == 0) {
+					currentMotorSpeed += gameSettings.speedMinStepSize + random(gameSettings.speedMaxStepSize - gameSettings.speedMinStepSize + 1);
+				}
+				else {
+					currentMotorSpeed -= gameSettings.speedMinStepSize + random(gameSettings.speedMaxStepSize - gameSettings.speedMinStepSize + 1);
+				}
 				if (currentMotorSpeed < MIN_MOTOR_SPEED+20+gamePhase*10) {
 					currentMotorSpeed = MIN_MOTOR_SPEED+20+gamePhase*10;
 				}

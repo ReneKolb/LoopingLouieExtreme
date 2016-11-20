@@ -292,6 +292,15 @@ void inline cmd_setEnabledPlayers() {
 	}
 }
 
+void inline cmd_setNoAnimMode() {
+	if (readSize == 1) {
+		gameSettings.no_anim_mode = atoi(buffer) != 0;
+	}
+	else {
+		Log("Error: Wrong dara size in setNoAnimMode");
+	}
+}
+
 void fillBuffer(boolean usb) {
 	//first clear old buffer
 	memset(buffer, 0, sizeof(buffer));
@@ -415,6 +424,10 @@ void handleSerialInput() {
 		case 'v':
 			fillBuffer(usbAvailable);
 			cmd_speedMax();
+			break;
+		case 'w':
+			fillBuffer(usbAvailable);
+			cmd_setNoAnimMode();
 			break;
 		case 'A':
 			pin = Serial.parseInt();

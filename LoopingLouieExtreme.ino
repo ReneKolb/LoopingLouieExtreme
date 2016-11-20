@@ -303,7 +303,6 @@ void setup()
 	}
 
 	Log("setup");
-
 	//init bluetooth
 	if (BLUETOOTH) {
 		Log("init bluetooth");

@@ -101,7 +101,7 @@ struct Color {
 #define BLACK							{ 0, 0, 0 }
 const struct Color COLOR[]	=			{ RED, GREEN, BLUE, YELLOW, PURPLE, AQUA, WHITE, BLACK };
 
-static const struct Color PlayerColor[4]	=		{ RED,PURPLE, YELLOW,GREEN };
+static const struct Color PlayerColor[4]	=		{ RED, PURPLE, YELLOW, GREEN };
 
 // ********** Define Pins: Special-Button ********** 
 #define PLAYER1_SPECIAL_BUTTON		{0,28}//28
@@ -309,6 +309,8 @@ struct GameSettings{
 	int speedMaxStepSize; 
 	bool enableReverse;
 
+	bool no_anim_mode;
+
 	//Chef Mode
 	bool chefMode;
 	bool chefRoulette;     //könnte man zusammenfassen
@@ -431,10 +433,10 @@ struct AnimationTmr {
 
 NewAnimation AnimationDB[] = {
 	//Booster Display Animation
-/*0*/ 	{ BOOSTER_LEDS,			0,  3,  FILLFORWARD,		100 }, 
-/*1*/ 	{ BOOSTER_LEDS,			4,  7,  FILLBACKWARD,		100 },
+/*0*/ 	{ BOOSTER_LEDS,			0,  3,  FILLFORBACKWARD,	100 },
+/*1*/ 	{ BOOSTER_LEDS,			4,  7,  FILLFORBACKWARD,	100 },
 /*2*/ 	{ BOOSTER_LEDS,			8,  11, FILLFORBACKWARD,	100 },
-/*3*/ 	{ BOOSTER_LEDS,			12, 15, FORBACKWARD,		100 },
+/*3*/ 	{ BOOSTER_LEDS,			12, 15, FILLFORBACKWARD,	100 },
 /*4*/ 	{ UVLEDs,				0,  15, BLINK,				1500},
 /*5*/ 	{ UVLEDs_OUTER,			0,  7,  BLINK,				1500},
 /*6*/ 	{ UVLEDs_INNER,			0,  7,  BLINK,				640},
@@ -473,6 +475,9 @@ NewAnimation AnimationDB[] = {
 /*31*/	{ COLOR_LIST,			0,	3,	COLOR_BLINK,		50},
 /*32*/	{ COLOR,				0,	5,	COLOR_BLINK_ALL,	100},
 /*33*/	{COLOR_BLINK_LIST,		0,	11,	COLOR_BLINK_ALL,	100},
+
+/*34*/  { playerCircle,         0,  31, BLINK,				500},
+/*35*/  { playerMiddleColors,   0,  19, BLINK,				500 },
 };
 
 struct CurrentAnimationSettings {
